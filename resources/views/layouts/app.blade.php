@@ -51,6 +51,10 @@
                     class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-blue-700 {{ request()->routeIs('principal.reports*') ? 'bg-blue-700' : '' }}">
                         <i class="bi bi-file-earmark-text"></i> Reports
                     </a>
+                    <a href="{{ route('principal.activity.logs') }}"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-blue-700 {{ request()->routeIs('principal.activity*') ? 'bg-blue-700' : '' }}">
+                        <i class="bi bi-clock-history"></i> Activity Logs
+                    </a>
                 @else
                     <a href="{{ route('adviser.dashboard') }}"
                     class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-blue-700 {{ request()->routeIs('adviser.dashboard') ? 'bg-blue-700' : '' }}">
