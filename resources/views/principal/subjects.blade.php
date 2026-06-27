@@ -1,0 +1,189 @@
+@extends('layouts.app')
+
+@section('title', 'Subjects')
+@section('subtitle', 'Manage SHS subjects')
+
+@section('content')
+
+@if(session('success'))
+    <div class="mb-4 p-4 bg-green-100 text-green-700 rounded-lg text-sm">{{ session('success') }}</div>
+@endif
+
+@if(session('error'))
+    <div class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg text-sm">{{ session('error') }}</div>
+@endif
+
+<div class="flex justify-end mb-4">
+    <button type="button" onclick="openAddModal()"
+        class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
+        + Add Subject
+    </button>
+</div>
+
+{{-- Filter by Type --}}
+<div class="bg-white rounded-xl shadow-sm p-4 mb-4 flex gap-4 items-center">
+    <span class="text-sm text-gray-500 font-medium">Filter:</span>
+    <a href="{{ route('principal.subjects') }}"
+       class="text-sm px-3 py-1 rounded-full {{ !request('type') ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+        All
+    </a>
+    <a href="{{ route('principal.subjects', ['type' => 'core']) }}"
+       class="text-sm px-3 py-1 rounded-full {{ request('type') === 'core' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+        Core
+    </a>
+    <a href="{{ route('principal.subjects', ['type' => 'elective']) }}"
+       class="text-sm px-3 py-1 rounded-full {{ request('type') === 'elective' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+        Elective
+    </a>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm overflow-x-auto">
+    <table class="w-full text-sm">
+        <thead class="bg-gray-50 text-gray-500">
+            <tr>
+                <th class="text-left px-6 py-3">Subject Name</th>
+                <th class="text-left px-6 py-3">Type</th>
+                <th class="text-left px-6 py-3">Grade Level</th>
+                <th class="text-left px-6 py-3">Track</th>
+                <th class="text-left px-6 py-3">Specialization</th>
+                <th class="px-6 py-3 text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+            @forelse($subjects as $subject)
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-3 font-medium text-gray-800">{{ $subject->name }}</td>
+                <td class="px-6 py-3">
+                    @if($subject->type === 'core')
+                        <span class="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded">
+                            Core
+                        </span>
+                    @else
+                        <span class="bg-orange-100 text-orange-700 text-xs font-semibold px-2 py-1 rounded">
+                            Elective
+                        </span>
+                    @endif
+                </td>
+                <td class="px-6 py-3 text-gray-600">Grade {{ $subject->grade_level }}</td>
+                <td class="px-6 py-3 text-gray-600">
+                    {{ $subject->track->name ?? '—' }}
+                </td>
+                <td class="px-6 py-3 text-gray-600">
+                    {{ $subject->specialization->name ?? '—' }}
+                </td>
+                <td class="px-6 py-3 text-right space-x-2">
+                    <button type="button"
+                        onclick='openEditModal(@json($subject))'
+                        class="text-blue-600 hover:underline text-sm">Edit</button>
+
+                    <form method="POST"
+                          action="{{ route('principal.subjects.destroy', $subject->id) }}"
+                          class="inline"
+                          onsubmit="return confirm('Delete this subject?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-red-600 hover:underline text-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="6" class="px-6 py-6 text-center text-gray-400">
+                    No subjects yet.
+                </td>
+            </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+
+{{-- MODAL --}}
+<div id="subjectModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
+
+        <div class="flex justify-between items-center mb-4">
+            <h3 id="modalTitle" class="text-lg font-semibold text-gray-800">Add Subject</h3>
+            <button type="button" onclick="closeModal()"
+                    class="text-gray-400 hover:text-gray-600">✕</button>
+        </div>
+
+        <form id="subjectForm" method="POST" class="space-y-4">
+            @csrf
+            <input type="hidden" name="_method" id="formMethod" value="POST">
+
+            <div>
+                <label class="block text-sm text-gray-600 mb-1">Subject Name</label>
+                <input type="text" name="name" id="subjectName" required
+                       placeholder="e.g. Effective Communication"
+                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">Type</label>
+                    <select name="type" id="subjectType" required onchange="toggleTrackFields()"
+                            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <option value="">— Select Type —</option>
+                        <option value="core">Core</option>
+                        <option value="elective">Elective</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">Grade Level</label>
+                    <select name="grade_level" id="subjectGrade" required
+                            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <option value="">— Select Grade —</option>
+                        <option value="11">Grade 11</option>
+                        <option value="12">Grade 12</option>
+                    </select>
+                </div>
+            </div>
+
+            {{-- Track at Specialization — visible lang kung Elective --}}
+            <div id="trackFields" class="hidden space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">Track</label>
+                    <select name="track_id" id="subjectTrack"
+                            onchange="loadSpecializations(this.value)"
+                            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <option value="">— Select Track —</option>
+                        @foreach($tracks as $track)
+                            <option value="{{ $track->id }}">{{ $track->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">
+                        Specialization
+                        <span class="text-gray-400 text-xs">(optional — kung para sa specific specialization lang)</span>
+                    </label>
+                    <select name="specialization_id" id="subjectSpec"
+                            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <option value="">— All specializations in track —</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2">
+                <button type="button" onclick="closeModal()"
+                        class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
+                <button type="submit"
+                        class="bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
+                    Save Subject
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    const SUBJECT_STORE_URL   = "{{ route('principal.subjects.store') }}";
+    const SPEC_BY_TRACK_URL   = "{{ url('principal/specializations-by-track') }}";
+    const ALL_SPECIALIZATIONS = @json($specializations);
+</script>
+<script src="{{ asset('js/principal/subjects.js') }}"></script>
+@endpush
+
+@endsection
