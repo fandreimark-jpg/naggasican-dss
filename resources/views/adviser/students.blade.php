@@ -33,7 +33,7 @@
                 <td class="px-6 py-3 text-right">
                     <button type="button"
                         onclick='openEditModal(@json($student))'
-                        class="text-blue-600 hover:underline text-sm">Edit</button>
+                        class="text-blue-600 hover:underline text-sm"><i class="bi bi-pencil-square"></i>Edit</button>
                 </td>
             </tr>
             @empty

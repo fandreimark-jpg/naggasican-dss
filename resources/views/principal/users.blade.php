@@ -8,7 +8,7 @@
 <div class="flex justify-end mb-4">
     <button type="button" onclick="openAddModal()"
         class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
-        + Add User
+        <i class="bi bi-plus-lg"></i>Add User
     </button>
 </div>
 
@@ -44,7 +44,7 @@
                 <td class="px-6 py-3 text-right space-x-2">
                     <button type="button"
                         onclick='openUserEditModal(@json($user))'
-                        class="text-blue-600 hover:underline"><i class="bi bi-pencil-square"></i> Edit</button>
+                        class="text-blue-600 hover:underline"><i class="bi bi-pencil-square"></i>Edit</button>
 
                     {{-- Hindi pwedeng i-delete ang sariling account --}}
                     @if($user->id !== auth()->id())
@@ -74,7 +74,7 @@
     <div id="userModalBox" class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
 
         <div class="flex justify-between items-center mb-4">
-            <h3 id="modalTitle" class="text-lg font-semibold text-gray-800">Add User</h3>
+            <h3 id="modalTitle" class="text-lg font-semibold text-gray-800"><i class="bi bi-plus-lg"></i>Add User</h3>
             <button type="button" onclick="closeUserModal()" class="text-gray-400 hover:text-gray-600">✕</button>
         </div>
 

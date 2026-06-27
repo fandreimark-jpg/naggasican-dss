@@ -9,7 +9,7 @@ use App\Models\Grade;
 use App\Models\Section;
 use App\Models\RiskResult;
 use App\Models\ReportSubmission;
-use App\Models\LogActivity;
+use App\Helpers\LogActivity;
 use Illuminate\Http\Request;
 
 class AdviserController extends Controller
@@ -213,11 +213,11 @@ class AdviserController extends Controller
         }
 
         // ✅ Log the activity
-        LogActivity::log(
-            action:      'encode_grades',
-            description: 'Encoded grades for Term ' . $request->grading_period . ' — Section ' . $section->name,
-            tableName:   'grades',
-            recordId:    $section->id
+       LogActivity::log(
+            'encode_grades',
+            'Encoded grades for Term ' . $request->grading_period . ' — Section ' . $section->name,
+            'grades',
+            $section->id
         );
 
         return back()->with('success', 'Grades saved successfully!');
@@ -362,22 +362,33 @@ class AdviserController extends Controller
         $command     = "\"{$pythonPath}\" \"{$scriptPath}\" \"{$tempFile}\" \"{$outputFile}\" 2>&1";
         $shellOutput = shell_exec($command);
 
-        \Log::info('runAnalytics shell output: ' . $shellOutput);
+\Log::info('Python command: ' . $command);
+\Log::info('Python output: ' . $shellOutput);
 
-        if (!file_exists($outputFile)) {
-            \Log::error('runAnalytics: output file not found. Shell said: ' . $shellOutput);
-            return;
-        }
+// PALITAN NG:
+if (!file_exists($outputFile)) {
+    \Log::error('Output file missing. Python said: ' . $shellOutput);
+    @unlink($tempFile);
+    return;
+}
 
-        $raw     = file_get_contents($outputFile);
-        $results = json_decode($raw, true);
+$raw = file_get_contents($outputFile);
+\Log::info('Raw JSON from Python: ' . $raw);
 
-        @unlink($tempFile);
-        @unlink($outputFile);
+@unlink($tempFile);
+@unlink($outputFile);
 
-        if (!$results) return;
+$results = json_decode($raw, true);
 
+if (json_last_error() !== JSON_ERROR_NONE) {
+    \Log::error('JSON decode error: ' . json_last_error_msg());
+    return;
+}
+
+if (!$results) return;
+        \Log::info('Raw results from Python: ' . json_encode($results));
         foreach ($results as $result) {
+            \Log::info('Saving result: ' . json_encode($result));
             RiskResult::updateOrCreate(
                 [
                     'student_id'     => $result['student_id'],

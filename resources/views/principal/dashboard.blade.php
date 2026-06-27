@@ -53,7 +53,8 @@
 {{-- Recommendations --}}
 <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
     <h3 class="font-semibold text-gray-800 text-sm mb-3">Recommendations</h3>
-    <div class="space-y-2">
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
 
         <div class="flex gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
             <span class="w-2 h-2 rounded-full bg-green-500 block mt-1 shrink-0"></span>
@@ -74,7 +75,7 @@
                     Moderate Risk — {{ $moderateRisk }} {{ $moderateRisk === 1 ? 'student' : 'students' }}
                 </p>
                 <p class="text-xs text-yellow-600 mt-0.5">Students need academic attention. Recommended actions:</p>
-                <ul class="text-xs text-yellow-600 mt-1 list-disc list-inside space-y-0">
+                <ul class="text-xs text-yellow-600 mt-1 list-disc list-inside">
                     <li>Conduct parent-teacher conference</li>
                     <li>Provide remedial or tutorial sessions</li>
                     <li>Monitor performance closely each term</li>
@@ -89,7 +90,7 @@
                     High Risk — {{ $highRisk }} {{ $highRisk === 1 ? 'student' : 'students' }}
                 </p>
                 <p class="text-xs text-red-600 mt-0.5">Immediate academic intervention required. Recommended actions:</p>
-                <ul class="text-xs text-red-600 mt-1 list-disc list-inside space-y-0">
+                <ul class="text-xs text-red-600 mt-1 list-disc list-inside">
                     <li>Schedule immediate parent conference</li>
                     <li>Refer to guidance counselor</li>
                     <li>Enroll in intensive remedial program</li>
@@ -153,7 +154,7 @@
         {{-- With Highest Honors --}}
         <div class="px-5 py-3">
             <div class="flex items-center gap-2 mb-2">
-                <span class="text-base">🏅</span>
+                <i class="bi bi-trophy-fill" style="font-size:40px; color:#FFD700;"></i>
                 <div>
                     <p class="text-xs font-semibold text-gray-800">With Highest Honors</p>
                     <p class="text-xs text-gray-400">Average of 98–100</p>
@@ -180,7 +181,7 @@
         {{-- With High Honors --}}
         <div class="px-5 py-3">
             <div class="flex items-center gap-2 mb-2">
-                <span class="text-base">🥇</span>
+                <i class="bi bi-bookmark-star-fill" style="color: #dc3545; font-size: 30px;"></i>
                 <div>
                     <p class="text-xs font-semibold text-gray-800">With High Honors</p>
                     <p class="text-xs text-gray-400">Average of 95–97</p>
@@ -207,7 +208,7 @@
         {{-- With Honors --}}
         <div class="px-5 py-3">
             <div class="flex items-center gap-2 mb-2">
-                <span class="text-base">🎖️</span>
+                <i class="bi bi-award-fill" style="color: gold; font-size: 30px;"></i>
                 <div>
                     <p class="text-xs font-semibold text-gray-800">With Honors</p>
                     <p class="text-xs text-gray-400">Average of 90–94</p>

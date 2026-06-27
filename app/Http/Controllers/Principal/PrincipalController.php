@@ -27,9 +27,15 @@ class PrincipalController extends Controller
         $totalSections = Section::count();
         $totalAdvisers = User::where('role', 'adviser')->count();
 
-        $lowRisk      = RiskResult::where('risk_level', 'low')->count();
-        $moderateRisk = RiskResult::where('risk_level', 'moderate')->count();
-        $highRisk     = RiskResult::where('risk_level', 'high')->count();
+        $latestPerStudent = RiskResult::whereIn('id',
+            RiskResult::selectRaw('MAX(id) as id')
+                ->groupBy('student_id')
+                ->pluck('id')
+        )->get();
+
+        $lowRisk      = $latestPerStudent->where('risk_level', 'low')->count();
+        $moderateRisk = $latestPerStudent->where('risk_level', 'moderate')->count();
+        $highRisk     = $latestPerStudent->where('risk_level', 'high')->count();
 
         $sections = Section::with([
             'students.grades',
@@ -154,10 +160,10 @@ class PrincipalController extends Controller
         ]);
 
         LogActivity::log(
-            action:      'create_user',
-            description: 'Created ' . $request->role . ' account: ' . $request->last_name . ', ' . $request->first_name,
-            tableName:   'users',
-            recordId:    null
+            'create_user',
+            'Created ' . $request->role . ' account: ' . $request->last_name . ', ' . $request->first_name,
+            'users',
+            null
         );
 
         return redirect()->route('principal.users')
@@ -438,7 +444,7 @@ class PrincipalController extends Controller
             ->get();
 
         $availableAdvisers = User::where('role', 'adviser')
-            ->whereDoesntHave('section')
+            ->with("section")
             ->orderBy('last_name')
             ->get();
 
@@ -476,10 +482,10 @@ class PrincipalController extends Controller
         ]);
 
         LogActivity::log(
-            action:      'create_section',
-            description: 'Created section: ' . $request->name,
-            tableName:   'sections',
-            recordId:    null
+            'create_section',
+            'Created section: ' . $request->name,
+            'sections',
+            null
         );
 
         return redirect()->route('principal.sections')
@@ -489,6 +495,7 @@ class PrincipalController extends Controller
     public function updateSection(Request $request, $id)
     {
         $section = Section::findOrFail($id);
+        $adviserId = $request->adviser_id ?: null;
 
         $request->validate([
             'name'              => 'required|string|max:255',
@@ -498,6 +505,19 @@ class PrincipalController extends Controller
             'school_year'       => 'required|string|max:20',
             'adviser_id'        => 'nullable|exists:users,id',
         ]);
+
+        // Dagdag na check — kung may adviser na assigned sa ibang section
+        if ($adviserId) {
+            $existingSection = Section::where('adviser_id', $adviserId)
+                ->where('id', '!=', $id)
+                ->first();
+
+            if ($existingSection) {
+                return back()->withErrors([
+                    'adviser_id' => 'This adviser is already assigned to Section ' . $existingSection->name . '.'
+                ])->withInput();
+            }
+        }
 
         $section->update([
             'name'              => $request->name,
@@ -577,10 +597,10 @@ class PrincipalController extends Controller
         ]));
 
         LogActivity::log(
-            action:      'add_student',
-            description: 'Added student: ' . $request->last_name . ', ' . $request->first_name,
-            tableName:   'students',
-            recordId:    null
+            'add_student',
+            'Added student: ' . $request->last_name . ', ' . $request->first_name,
+            'students',
+            null
         );
 
         return redirect()->route('principal.students')
@@ -616,10 +636,10 @@ class PrincipalController extends Controller
         $student->delete();
 
         LogActivity::log(
-            action:      'delete_student',
-            description: 'Removed student: ' . $student->last_name . ', ' . $student->first_name,
-            tableName:   'students',
-            recordId:    $id
+            'delete_student',
+            'Removed student: ' . $student->last_name . ', ' . $student->first_name,
+            'students',
+            $id
         );
 
         return redirect()->route('principal.students')

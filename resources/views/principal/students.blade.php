@@ -8,7 +8,7 @@
 <div class="flex justify-end mb-4">
     <button type="button" onclick="openAddStudentModal()"
         class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
-        + Add Student
+        <i class="bi bi-plus-lg"></i>Add Student
     </button>
 </div>
 
@@ -65,7 +65,7 @@
                 <td class="px-6 py-3 text-right space-x-2">
                     <button type="button"
                         onclick='openEditStudentModal(@json($student))'
-                        class="text-blue-600 hover:underline">Edit</button>
+                        class="text-blue-600 hover:underline"><i class="bi bi-pencil-square"></i>Edit</button>
 
                     <form method="POST"
                           action="{{ route('principal.students.destroy', $student->id) }}"
@@ -73,7 +73,7 @@
                           onsubmit="return confirm('Remove this student?');">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="text-red-600 hover:underline">Delete</button>
+                        <button type="submit" class="text-red-600 hover:underline"><i class="bi bi-trash"></i>Delete</button>
                     </form>
                 </td>
             </tr>

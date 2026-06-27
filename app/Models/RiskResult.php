@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class RiskResult extends Model
 {
     protected $fillable = [
-        'student_id', 'grading_period', 'average_grade', 'risk_level', 'school_year', 'generated_at'
+        'student_id', 'grading_period', 'average_grade', 'risk_level','confidence', 'school_year', 'generated_at'
     ];
 
     public function student()

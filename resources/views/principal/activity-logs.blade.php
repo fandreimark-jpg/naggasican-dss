@@ -19,7 +19,6 @@
                 <th class="text-left px-3 py-2">Role</th>
                 <th class="text-left px-3 py-2">Action</th>
                 <th class="text-left px-3 py-2">Description</th>
-                <th class="text-left px-3 py-2">IP Address</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-50">
@@ -54,9 +53,6 @@
                 </td>
                 <td class="px-3 py-2 text-xs text-gray-600">
                     {{ $log->description }}
-                </td>
-                <td class="px-3 py-2 text-xs text-gray-400">
-                    {{ $log->ip_address ?? '—' }}
                 </td>
             </tr>
             @empty

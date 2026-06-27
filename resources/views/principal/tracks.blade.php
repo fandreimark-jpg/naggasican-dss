@@ -16,7 +16,7 @@
 <div class="flex justify-end mb-4">
     <button type="button" onclick="openAddModal()"
         class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
-        + Add Track
+        <i class="bi bi-plus-lg"></i>Add Track
     </button>
 </div>
 

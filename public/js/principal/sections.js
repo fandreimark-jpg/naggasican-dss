@@ -14,14 +14,25 @@ function openAddModal() {
 
     // ✅ FIX — Sa Add modal, itago ang advisers na may section na
     const adviserSelect = document.getElementById('sectionAdviser');
-    adviserSelect.value = '';
+
+    // I-show muna lahat bago mag-filter
     Array.from(adviserSelect.options).forEach(option => {
-        if (option.value !== '' && option.dataset.sectionId !== '') {
+        option.style.display = '';
+    });
+
+    // Itago lang ang advisers na assigned sa IBANG section
+    Array.from(adviserSelect.options).forEach(option => {
+        if (
+            option.value !== '' &&
+            option.dataset.sectionId !== '' &&
+            parseInt(option.dataset.sectionId) !== parseInt(section.id)
+        ) {
             option.style.display = 'none';
-        } else {
-            option.style.display = '';
         }
     });
+
+    // I-set ang current adviser
+    adviserSelect.value = section.adviser_id ?? '';
 }
 
 function openEditModal(section) {
