@@ -67,8 +67,25 @@
 
     {{-- Pagination --}}
     @if($logs->hasPages())
-    <div class="px-5 py-3 border-t">
-        {{ $logs->links() }}
+    <div class="px-6 py-4 border-t flex flex-col items-center gap-2 text-sm text-gray-500">
+        <div class="flex items-center gap-1">
+            @if($logs->onFirstPage())
+                <span class="px-3 py-1 rounded border text-gray-300 cursor-not-allowed">← Prev</span>
+            @else
+                <a href="{{ $logs->previousPageUrl() }}"
+                   class="px-3 py-1 rounded border hover:bg-gray-50 text-gray-600">← Prev</a>
+            @endif
+            <span class="px-3 py-1 rounded border bg-blue-700 text-white font-medium">
+                {{ $logs->currentPage() }}
+            </span>
+            @if($logs->hasMorePages())
+                <a href="{{ $logs->nextPageUrl() }}"
+                   class="px-3 py-1 rounded border hover:bg-gray-50 text-gray-600">Next →</a>
+            @else
+                <span class="px-3 py-1 rounded border text-gray-300 cursor-not-allowed">Next →</span>
+            @endif
+        </div>
+        <span class="text-xs">Showing {{ $logs->firstItem() }}–{{ $logs->lastItem() }} of {{ $logs->total() }} Logs</span>
     </div>
     @endif
 </div>

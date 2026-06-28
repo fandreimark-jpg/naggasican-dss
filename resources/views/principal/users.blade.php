@@ -13,14 +13,12 @@
             <p class="text-xs text-gray-400">{{ $users->total() }} total accounts</p>
         </div>
         <div class="flex items-center gap-3">
-            {{-- Search Bar --}}
             <div class="relative">
                 <input type="text" id="userSearch"
                     placeholder="Search users..."
                     class="border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-64">
                 <i class="bi bi-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
             </div>
-            {{-- Add Button --}}
             <button type="button" onclick="openAddModal()"
                 class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 whitespace-nowrap">
                 <i class="bi bi-plus-lg"></i> Add User
@@ -28,7 +26,6 @@
         </div>
     </div>
 
-    {{-- Table --}}
     <table class="w-full text-sm" id="userTable">
         <thead class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
             <tr>
@@ -69,7 +66,7 @@
                     <form method="POST"
                         action="{{ route('principal.users.destroy', $user->id) }}"
                         class="inline"
-                        onsubmit="return confirm('Remove this user?');">
+                        data-confirm="Remove user {{ $user->first_name }} {{ $user->last_name }}?">
                         @csrf
                         @method('DELETE')
                         <button type="submit"
@@ -91,34 +88,28 @@
         </tbody>
     </table>
 
-    {{-- No results row (hidden by default) --}}
     <div id="noResults" class="hidden px-6 py-8 text-center text-gray-400">
         <i class="bi bi-search text-2xl block mb-2"></i>
         No users found matching your search.
     </div>
 
-    {{-- Pagination --}}
     @if($users->hasPages())
     <div class="px-6 py-4 border-t flex items-center justify-center gap-2 text-sm">
-
         @if($users->onFirstPage())
             <span class="px-3 py-1 rounded border text-gray-300 cursor-not-allowed">← Prev</span>
         @else
             <a href="{{ $users->previousPageUrl() }}"
                class="px-3 py-1 rounded border hover:bg-gray-50 text-gray-600">← Prev</a>
         @endif
-
         <span class="px-3 py-1 rounded border bg-blue-700 text-white font-medium">
             {{ $users->currentPage() }}
         </span>
-
         @if($users->hasMorePages())
             <a href="{{ $users->nextPageUrl() }}"
                class="px-3 py-1 rounded border hover:bg-gray-50 text-gray-600">Next →</a>
         @else
             <span class="px-3 py-1 rounded border text-gray-300 cursor-not-allowed">Next →</span>
         @endif
-
     </div>
     @endif
 </div>
@@ -225,12 +216,8 @@
         let visibleCount = 0;
         rows.forEach(row => {
             const text = row.textContent.toLowerCase();
-            if (text.includes(query)) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
+            if (text.includes(query)) { row.style.display = ''; visibleCount++; }
+            else row.style.display = 'none';
         });
         document.getElementById('noResults').classList.toggle('hidden', visibleCount > 0);
     });

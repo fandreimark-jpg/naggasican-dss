@@ -5,16 +5,7 @@
 
 @section('content')
 
-@if(session('success'))
-    <div class="mb-4 p-4 bg-green-100 text-green-700 rounded-lg text-sm">{{ session('success') }}</div>
-@endif
-
-@if(session('error'))
-    <div class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg text-sm">{{ session('error') }}</div>
-@endif
-
 <div class="bg-white rounded-xl shadow-sm mb-0">
-    {{-- Header + Add Button --}}
     <div class="flex items-center justify-between px-6 py-4 border-b">
         <div>
             <h2 class="text-sm font-semibold text-gray-800">All Specializations</h2>
@@ -54,7 +45,7 @@
                     <form method="POST"
                           action="{{ route('principal.specializations.destroy', $spec->id) }}"
                           class="inline"
-                          onsubmit="return confirm('Delete this specialization?');">
+                          data-confirm="Delete specialization {{ $spec->name }}?">
                         @csrf
                         @method('DELETE')
                         <button type="submit"

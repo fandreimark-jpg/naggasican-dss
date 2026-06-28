@@ -5,14 +5,6 @@
 
 @section('content')
 
-@if(session('success'))
-    <div class="mb-4 p-4 bg-green-100 text-green-700 rounded-lg text-sm">{{ session('success') }}</div>
-@endif
-
-@if(session('error'))
-    <div class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg text-sm">{{ session('error') }}</div>
-@endif
-
 <div class="bg-white rounded-xl shadow-sm mb-0">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 px-6 py-4 border-b">
         <div>
@@ -20,7 +12,6 @@
             <p class="text-xs text-gray-400">{{ $subjects->count() }} total subjects</p>
         </div>
         <div class="flex items-center gap-3 flex-wrap">
-            {{-- Filter buttons --}}
             <div class="flex gap-2">
                 <a href="{{ route('principal.subjects') }}"
                    class="text-xs px-3 py-1.5 rounded-full {{ !request('type') ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">All</a>
@@ -29,14 +20,12 @@
                 <a href="{{ route('principal.subjects', ['type' => 'elective']) }}"
                    class="text-xs px-3 py-1.5 rounded-full {{ request('type') === 'elective' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">Elective</a>
             </div>
-            {{-- Search --}}
             <div class="relative">
                 <input type="text" id="subjectSearch"
                     placeholder="Search subjects..."
                     class="border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-56">
                 <i class="bi bi-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
             </div>
-            {{-- Add Button --}}
             <button type="button" onclick="openAddModal()"
                 class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 whitespace-nowrap">
                 <i class="bi bi-plus-lg"></i> Add Subject
@@ -78,7 +67,7 @@
                     <form method="POST"
                           action="{{ route('principal.subjects.destroy', $subject->id) }}"
                           class="inline"
-                          onsubmit="return confirm('Delete this subject?');">
+                          data-confirm="Delete subject {{ $subject->name }}?">
                         @csrf
                         @method('DELETE')
                         <button type="submit"
@@ -197,12 +186,8 @@
         let visibleCount = 0;
         rows.forEach(row => {
             const text = row.textContent.toLowerCase();
-            if (text.includes(query)) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
+            if (text.includes(query)) { row.style.display = ''; visibleCount++; }
+            else row.style.display = 'none';
         });
         document.getElementById('noSubjectResults').classList.toggle('hidden', visibleCount > 0);
     });

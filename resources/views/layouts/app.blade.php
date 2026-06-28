@@ -99,23 +99,204 @@
                     <p class="text-sm text-gray-500">@yield('subtitle')</p>
                 </div>
 
-                {{-- Flash Messages --}}
-                @if(session('success'))
-                    <div class="mb-3 p-3 bg-green-100 text-green-700 rounded-lg text-sm">
-                        {{ session('success') }}
-                    </div>
-                @endif
-                @if(session('error'))
-                    <div class="mb-3 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
-                        {{ session('error') }}
-                    </div>
-                @endif
-
                 @yield('content')
 
             </div>
         </main>
     </div>
+
+    {{-- ===================== TOAST NOTIFICATION ===================== --}}
+    @if(session('success') || session('error') || session('warning'))
+    <div id="flashToast"
+         class="fixed top-6 right-6 z-[9999] flex items-start gap-3 px-5 py-4 rounded-xl shadow-2xl border w-80
+                opacity-0 translate-y-3 transition-all duration-500
+                {{ session('success') ? 'bg-white border-green-300' : '' }}
+                {{ session('error')   ? 'bg-white border-red-300'   : '' }}
+                {{ session('warning') ? 'bg-white border-yellow-300': '' }}">
+
+        {{-- Colored left bar --}}
+        <div class="absolute left-0 top-0 bottom-0 w-1 rounded-l-xl
+            {{ session('success') ? 'bg-green-500' : '' }}
+            {{ session('error')   ? 'bg-red-500'   : '' }}
+            {{ session('warning') ? 'bg-yellow-400': '' }}">
+        </div>
+
+        {{-- Icon --}}
+        <div class="ml-2 mt-0.5 text-lg shrink-0
+            {{ session('success') ? 'text-green-500' : '' }}
+            {{ session('error')   ? 'text-red-500'   : '' }}
+            {{ session('warning') ? 'text-yellow-500': '' }}">
+            @if(session('success')) <i class="bi bi-check-circle-fill"></i> @endif
+            @if(session('error'))   <i class="bi bi-x-circle-fill"></i>     @endif
+            @if(session('warning')) <i class="bi bi-exclamation-circle-fill"></i> @endif
+        </div>
+
+        {{-- Text --}}
+        <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-gray-800">
+                @if(session('success')) Success @endif
+                @if(session('error'))   Error   @endif
+                @if(session('warning')) Warning @endif
+            </p>
+            <p class="text-xs text-gray-500 mt-0.5 leading-relaxed">
+                {{ session('success') ?? session('error') ?? session('warning') }}
+            </p>
+        </div>
+
+        {{-- Close button --}}
+        <button onclick="dismissToast()"
+                class="shrink-0 text-gray-300 hover:text-gray-500 text-lg leading-none mt-0.5">
+            <i class="bi bi-x"></i>
+        </button>
+
+        {{-- Auto-progress bar --}}
+        <div id="toastProgress"
+             class="absolute bottom-0 left-0 right-0 h-0.5 rounded-b-xl
+                {{ session('success') ? 'bg-green-400' : '' }}
+                {{ session('error')   ? 'bg-red-400'   : '' }}
+                {{ session('warning') ? 'bg-yellow-400': '' }}"
+             style="animation: toastShrink 4s linear forwards;">
+        </div>
+    </div>
+
+    <style>
+        @keyframes toastShrink {
+            from { width: 100%; }
+            to   { width: 0%; }
+        }
+    </style>
+
+    <script>
+        (function () {
+            const toast = document.getElementById('flashToast');
+            if (!toast) return;
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    toast.classList.remove('opacity-0', 'translate-y-3');
+                    toast.classList.add('opacity-100', 'translate-y-0');
+                }, 80);
+            });
+            let autoDismiss = setTimeout(dismissToast, 4000);
+            toast.addEventListener('mouseenter', () => clearTimeout(autoDismiss));
+            toast.addEventListener('mouseleave', () => { autoDismiss = setTimeout(dismissToast, 1500); });
+        })();
+
+        function dismissToast() {
+            const toast = document.getElementById('flashToast');
+            if (!toast) return;
+            toast.classList.add('opacity-0', 'translate-y-3');
+            setTimeout(() => toast.remove(), 500);
+        }
+    </script>
+    @endif
+    {{-- ============================================================= --}}
+
+
+    {{-- ===================== CONFIRM DELETE MODAL ================== --}}
+    <div id="confirmDeleteModal"
+         class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[9998]">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden
+                    transform transition-all duration-200 scale-95 opacity-0"
+             id="confirmDeleteBox">
+
+            {{-- Red top bar --}}
+            <div class="h-1.5 bg-red-500 w-full"></div>
+
+            <div class="p-6">
+                {{-- Icon + Title --}}
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                        <i class="bi bi-trash text-red-600 text-lg"></i>
+                    </div>
+                    <h3 class="text-base font-semibold text-gray-800">Confirm Delete</h3>
+                </div>
+
+                {{-- Message --}}
+                <p id="confirmDeleteMessage" class="text-sm text-gray-600 mb-1 ml-13 pl-0.5"></p>
+                <p class="text-xs text-red-400 ml-13 pl-0.5 mb-5">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    This action cannot be undone.
+                </p>
+
+                {{-- Buttons --}}
+                <div class="flex justify-end gap-3">
+                    <button type="button"
+                            onclick="closeConfirmDelete()"
+                            class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                        <i class="bi bi-x-lg mr-1"></i> Cancel
+                    </button>
+                    <button type="button"
+                            id="confirmDeleteBtn"
+                            onclick="proceedDelete()"
+                            class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors">
+                        <i class="bi bi-trash mr-1"></i> Yes, Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let _pendingDeleteForm = null;
+
+        // Intercept ALL form submits with data-confirm attribute
+        document.addEventListener('submit', function (e) {
+            const form = e.target;
+            if (form.dataset.confirm) {
+                e.preventDefault();
+                showConfirmDelete(form, form.dataset.confirm);
+            }
+        });
+
+        function showConfirmDelete(form, message) {
+            _pendingDeleteForm = form;
+            document.getElementById('confirmDeleteMessage').textContent = message;
+
+            const modal = document.getElementById('confirmDeleteModal');
+            const box   = document.getElementById('confirmDeleteBox');
+
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    box.classList.remove('scale-95', 'opacity-0');
+                    box.classList.add('scale-100', 'opacity-100');
+                }, 20);
+            });
+        }
+
+        function closeConfirmDelete() {
+            const modal = document.getElementById('confirmDeleteModal');
+            const box   = document.getElementById('confirmDeleteBox');
+
+            box.classList.remove('scale-100', 'opacity-100');
+            box.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                _pendingDeleteForm = null;
+            }, 200);
+        }
+
+        function proceedDelete() {
+            if (_pendingDeleteForm) {
+                // Disable button to prevent double click
+                document.getElementById('confirmDeleteBtn').disabled = true;
+                document.getElementById('confirmDeleteBtn').innerHTML =
+                    '<i class="bi bi-hourglass-split mr-1"></i> Deleting...';
+                _pendingDeleteForm.submit();
+            }
+        }
+
+        // Close on backdrop click
+        document.getElementById('confirmDeleteModal').addEventListener('click', function (e) {
+            if (e.target === this) closeConfirmDelete();
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeConfirmDelete();
+        });
+    </script>
+    {{-- ============================================================= --}}
 
     @stack('scripts')
 </body>

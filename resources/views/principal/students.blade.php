@@ -5,23 +5,13 @@
 
 @section('content')
 
-@if(session('error'))
-    <div class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg text-sm">{{ session('error') }}</div>
-@endif
-
-@if(session('success'))
-    <div class="mb-4 p-4 bg-green-100 text-green-700 rounded-lg text-sm">{{ session('success') }}</div>
-@endif
-
 <div class="bg-white rounded-xl shadow-sm mb-0">
-    {{-- Header + Search + Filter + Add --}}
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 px-6 py-4 border-b">
         <div>
             <h2 class="text-sm font-semibold text-gray-800">All Students</h2>
             <p class="text-xs text-gray-400">{{ $students->count() }} total students</p>
         </div>
         <div class="flex items-center gap-3 flex-wrap">
-            {{-- Filter by Section --}}
             <form method="GET">
                 <select name="section_id" onchange="this.form.submit()"
                     class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
@@ -34,14 +24,12 @@
                     @endforeach
                 </select>
             </form>
-            {{-- Search --}}
             <div class="relative">
                 <input type="text" id="studentSearch"
                     placeholder="Search students..."
                     class="border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-56">
                 <i class="bi bi-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
             </div>
-            {{-- Add Button --}}
             <button type="button" onclick="openAddStudentModal()"
                 class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 whitespace-nowrap">
                 <i class="bi bi-plus-lg"></i> Add Student
@@ -84,7 +72,7 @@
                     <form method="POST"
                           action="{{ route('principal.students.destroy', $student->id) }}"
                           class="inline"
-                          onsubmit="return confirm('Remove this student?');">
+                          data-confirm="Remove student {{ $student->last_name }}, {{ $student->first_name }}?">
                         @csrf
                         @method('DELETE')
                         <button type="submit"
@@ -105,13 +93,11 @@
         </tbody>
     </table>
 
-    {{-- No search results --}}
     <div id="noStudentResults" class="hidden px-6 py-8 text-center text-gray-400">
         <i class="bi bi-search text-2xl block mb-2"></i>
         No students found matching your search.
     </div>
 
-    {{-- Pagination --}}
     @if($students->hasPages())
     <div class="px-6 py-4 border-t flex flex-col items-center gap-2 text-sm text-gray-500">
         <div class="flex items-center gap-1">
@@ -121,11 +107,9 @@
                 <a href="{{ $students->previousPageUrl() }}"
                    class="px-3 py-1 rounded border hover:bg-gray-50 text-gray-600">← Prev</a>
             @endif
-
             <span class="px-3 py-1 rounded border bg-blue-700 text-white font-medium">
                 {{ $students->currentPage() }}
             </span>
-
             @if($students->hasMorePages())
                 <a href="{{ $students->nextPageUrl() }}"
                    class="px-3 py-1 rounded border hover:bg-gray-50 text-gray-600">Next →</a>
@@ -246,12 +230,8 @@
         let visibleCount = 0;
         rows.forEach(row => {
             const text = row.textContent.toLowerCase();
-            if (text.includes(query)) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
+            if (text.includes(query)) { row.style.display = ''; visibleCount++; }
+            else row.style.display = 'none';
         });
         document.getElementById('noStudentResults').classList.toggle('hidden', visibleCount > 0);
     });

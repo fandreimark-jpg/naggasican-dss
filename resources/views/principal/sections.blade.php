@@ -5,14 +5,6 @@
 
 @section('content')
 
-@if(session('success'))
-    <div class="mb-4 p-4 bg-green-100 text-green-700 rounded-lg text-sm">{{ session('success') }}</div>
-@endif
-
-@if(session('error'))
-    <div class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg text-sm">{{ session('error') }}</div>
-@endif
-
 <div class="bg-white rounded-xl shadow-sm mb-0">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 px-6 py-4 border-b">
         <div>
@@ -71,7 +63,7 @@
                     <form method="POST"
                           action="{{ route('principal.sections.destroy', $section->id) }}"
                           class="inline"
-                          onsubmit="return confirm('Delete this section?');">
+                          data-confirm="Delete section {{ $section->name }}?">
                         @csrf
                         @method('DELETE')
                         <button type="submit"
@@ -206,12 +198,8 @@
         let visibleCount = 0;
         rows.forEach(row => {
             const text = row.textContent.toLowerCase();
-            if (text.includes(query)) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
+            if (text.includes(query)) { row.style.display = ''; visibleCount++; }
+            else row.style.display = 'none';
         });
         document.getElementById('noSectionResults').classList.toggle('hidden', visibleCount > 0);
     });
