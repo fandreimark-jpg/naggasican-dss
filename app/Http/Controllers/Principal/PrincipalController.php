@@ -125,7 +125,7 @@ class PrincipalController extends Controller
             ->with('section')
             ->orderBy('role')
             ->orderBy('name')
-            ->get();
+            ->paginate(10);
 
         return view('principal.users', compact('users'));
     }
@@ -571,7 +571,7 @@ class PrincipalController extends Controller
             $query->where('section_id', request('section_id'));
         }
 
-        $students = $query->get();
+        $students = $query->paginate(10);
         $sections = Section::with(['track', 'specialization'])
             ->orderBy('grade_level')
             ->get();

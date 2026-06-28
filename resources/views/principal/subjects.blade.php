@@ -13,33 +13,39 @@
     <div class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg text-sm">{{ session('error') }}</div>
 @endif
 
-<div class="flex justify-end mb-4">
-    <button type="button" onclick="openAddModal()"
-        class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
-        <i class="bi bi-plus-lg"></i>Add Subject
-    </button>
-</div>
+<div class="bg-white rounded-xl shadow-sm mb-0">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 px-6 py-4 border-b">
+        <div>
+            <h2 class="text-sm font-semibold text-gray-800">All Subjects</h2>
+            <p class="text-xs text-gray-400">{{ $subjects->count() }} total subjects</p>
+        </div>
+        <div class="flex items-center gap-3 flex-wrap">
+            {{-- Filter buttons --}}
+            <div class="flex gap-2">
+                <a href="{{ route('principal.subjects') }}"
+                   class="text-xs px-3 py-1.5 rounded-full {{ !request('type') ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">All</a>
+                <a href="{{ route('principal.subjects', ['type' => 'core']) }}"
+                   class="text-xs px-3 py-1.5 rounded-full {{ request('type') === 'core' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">Core</a>
+                <a href="{{ route('principal.subjects', ['type' => 'elective']) }}"
+                   class="text-xs px-3 py-1.5 rounded-full {{ request('type') === 'elective' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">Elective</a>
+            </div>
+            {{-- Search --}}
+            <div class="relative">
+                <input type="text" id="subjectSearch"
+                    placeholder="Search subjects..."
+                    class="border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-56">
+                <i class="bi bi-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
+            </div>
+            {{-- Add Button --}}
+            <button type="button" onclick="openAddModal()"
+                class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 whitespace-nowrap">
+                <i class="bi bi-plus-lg"></i> Add Subject
+            </button>
+        </div>
+    </div>
 
-{{-- Filter by Type --}}
-<div class="bg-white rounded-xl shadow-sm p-4 mb-4 flex gap-4 items-center">
-    <span class="text-sm text-gray-500 font-medium">Filter:</span>
-    <a href="{{ route('principal.subjects') }}"
-       class="text-sm px-3 py-1 rounded-full {{ !request('type') ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
-        All
-    </a>
-    <a href="{{ route('principal.subjects', ['type' => 'core']) }}"
-       class="text-sm px-3 py-1 rounded-full {{ request('type') === 'core' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
-        Core
-    </a>
-    <a href="{{ route('principal.subjects', ['type' => 'elective']) }}"
-       class="text-sm px-3 py-1 rounded-full {{ request('type') === 'elective' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
-        Elective
-    </a>
-</div>
-
-<div class="bg-white rounded-xl shadow-sm overflow-x-auto">
-    <table class="w-full text-sm">
-        <thead class="bg-gray-50 text-gray-500">
+    <table class="w-full text-sm" id="subjectTable">
+        <thead class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
             <tr>
                 <th class="text-left px-6 py-3">Subject Name</th>
                 <th class="text-left px-6 py-3">Type</th>
@@ -51,50 +57,52 @@
         </thead>
         <tbody class="divide-y divide-gray-100">
             @forelse($subjects as $subject)
-            <tr class="hover:bg-gray-50">
+            <tr class="hover:bg-gray-50 subject-row">
                 <td class="px-6 py-3 font-medium text-gray-800">{{ $subject->name }}</td>
                 <td class="px-6 py-3">
                     @if($subject->type === 'core')
-                        <span class="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded">
-                            Core
-                        </span>
+                        <span class="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded">Core</span>
                     @else
-                        <span class="bg-orange-100 text-orange-700 text-xs font-semibold px-2 py-1 rounded">
-                            Elective
-                        </span>
+                        <span class="bg-orange-100 text-orange-700 text-xs font-semibold px-2 py-1 rounded">Elective</span>
                     @endif
                 </td>
                 <td class="px-6 py-3 text-gray-600">Grade {{ $subject->grade_level }}</td>
-                <td class="px-6 py-3 text-gray-600">
-                    {{ $subject->track->name ?? '—' }}
-                </td>
-                <td class="px-6 py-3 text-gray-600">
-                    {{ $subject->specialization->name ?? '—' }}
-                </td>
+                <td class="px-6 py-3 text-gray-600">{{ $subject->track->name ?? '—' }}</td>
+                <td class="px-6 py-3 text-gray-600">{{ $subject->specialization->name ?? '—' }}</td>
                 <td class="px-6 py-3 text-right space-x-2">
                     <button type="button"
                         onclick='openEditModal(@json($subject))'
-                        class="text-blue-600 hover:underline text-sm"><i class="bi bi-pencil-square"></i>Edit</button>
-
+                        class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs font-medium border border-blue-200 rounded px-2 py-1 hover:bg-blue-50">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </button>
                     <form method="POST"
                           action="{{ route('principal.subjects.destroy', $subject->id) }}"
                           class="inline"
                           onsubmit="return confirm('Delete this subject?');">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="text-red-600 hover:underline text-sm"><i class="bi bi-trash"></i>Delete</button>
+                        <button type="submit"
+                            class="inline-flex items-center gap-1 text-red-600 hover:text-red-800 text-xs font-medium border border-red-200 rounded px-2 py-1 hover:bg-red-50">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
                     </form>
                 </td>
             </tr>
             @empty
             <tr>
-                <td colspan="6" class="px-6 py-6 text-center text-gray-400">
+                <td colspan="6" class="px-6 py-8 text-center text-gray-400">
+                    <i class="bi bi-book text-2xl block mb-2"></i>
                     No subjects yet.
                 </td>
             </tr>
             @endforelse
         </tbody>
     </table>
+
+    <div id="noSubjectResults" class="hidden px-6 py-8 text-center text-gray-400">
+        <i class="bi bi-search text-2xl block mb-2"></i>
+        No subjects found matching your search.
+    </div>
 </div>
 
 {{-- MODAL --}}
@@ -139,7 +147,6 @@
                 </div>
             </div>
 
-            {{-- Track at Specialization — visible lang kung Elective --}}
             <div id="trackFields" class="hidden space-y-4">
                 <div>
                     <label class="block text-sm text-gray-600 mb-1">Track</label>
@@ -152,11 +159,10 @@
                         @endforeach
                     </select>
                 </div>
-
                 <div>
                     <label class="block text-sm text-gray-600 mb-1">
                         Specialization
-                        <span class="text-gray-400 text-xs">(optional — kung para sa specific specialization lang)</span>
+                        <span class="text-gray-400 text-xs">(optional)</span>
                     </label>
                     <select name="specialization_id" id="subjectSpec"
                             class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
@@ -184,6 +190,23 @@
     const ALL_SPECIALIZATIONS = @json($specializations);
 </script>
 <script src="{{ asset('js/principal/subjects.js') }}"></script>
+<script>
+    document.getElementById('subjectSearch').addEventListener('input', function () {
+        const query = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.subject-row');
+        let visibleCount = 0;
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(query)) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        document.getElementById('noSubjectResults').classList.toggle('hidden', visibleCount > 0);
+    });
+</script>
 @endpush
 
 @endsection

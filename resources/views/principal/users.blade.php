@@ -5,20 +5,32 @@
 
 @section('content')
 
-<div class="flex justify-end mb-4">
-    <button type="button" onclick="openAddModal()"
-        class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
-        <i class="bi bi-plus-lg"></i>Add User
-    </button>
-</div>
+{{-- Header + Search + Add Button --}}
+<div class="bg-white rounded-xl shadow-sm mb-0">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 px-6 py-4 border-b">
+        <div>
+            <h2 class="text-sm font-semibold text-gray-800">All Users</h2>
+            <p class="text-xs text-gray-400">{{ $users->total() }} total accounts</p>
+        </div>
+        <div class="flex items-center gap-3">
+            {{-- Search Bar --}}
+            <div class="relative">
+                <input type="text" id="userSearch"
+                    placeholder="Search users..."
+                    class="border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-64">
+                <i class="bi bi-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
+            </div>
+            {{-- Add Button --}}
+            <button type="button" onclick="openAddModal()"
+                class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 whitespace-nowrap">
+                <i class="bi bi-plus-lg"></i> Add User
+            </button>
+        </div>
+    </div>
 
-@if(session('error'))
-    <div class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg text-sm">{{ session('error') }}</div>
-@endif
-
-<div class="bg-white rounded-xl shadow-sm overflow-x-auto">
-    <table class="w-full text-sm">
-        <thead class="bg-gray-50 text-gray-500">
+    {{-- Table --}}
+    <table class="w-full text-sm" id="userTable">
+        <thead class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
             <tr>
                 <th class="text-left px-6 py-3">Last Name</th>
                 <th class="text-left px-6 py-3">First Name</th>
@@ -28,25 +40,31 @@
                 <th class="px-6 py-3 text-right">Actions</th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100">
+        <tbody class="divide-y divide-gray-100" id="userTableBody">
             @forelse($users as $user)
-            <tr class="hover:bg-gray-50">
+            <tr class="hover:bg-gray-50 user-row">
                 <td class="px-6 py-3 font-medium text-gray-800">{{ $user->last_name ?? '—' }}</td>
                 <td class="px-6 py-3 text-gray-800">{{ $user->first_name ?? '—' }}</td>
-                <td class="px-6 py-3 text-gray-600">{{ $user->middle_name ?? '—' }}</td>
-                <td class="px-6 py-3 text-gray-600">{{ $user->email }}</td>
+                <td class="px-6 py-3 text-gray-500">{{ $user->middle_name ?? '—' }}</td>
+                <td class="px-6 py-3 text-gray-500">{{ $user->email }}</td>
                 <td class="px-6 py-3">
-                    <span class="px-2 py-1 rounded-full text-xs font-medium
-                        {{ $user->role === 'principal' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700' }}">
-                        {{ ucfirst($user->role) }}
-                    </span>
+                    @if($user->role === 'principal')
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">
+                            <i class="bi bi-shield-lock-fill"></i> Principal
+                        </span>
+                    @else
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                            <i class="bi bi-person-fill"></i> Adviser
+                        </span>
+                    @endif
                 </td>
                 <td class="px-6 py-3 text-right space-x-2">
                     <button type="button"
                         onclick='openUserEditModal(@json($user))'
-                        class="text-blue-600 hover:underline"><i class="bi bi-pencil-square"></i>Edit</button>
+                        class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs font-medium border border-blue-200 rounded px-2 py-1 hover:bg-blue-50">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </button>
 
-                    {{-- Hindi pwedeng i-delete ang sariling account --}}
                     @if($user->id !== auth()->id())
                     <form method="POST"
                         action="{{ route('principal.users.destroy', $user->id) }}"
@@ -54,18 +72,55 @@
                         onsubmit="return confirm('Remove this user?');">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="text-red-600 hover:underline"><i class="bi bi-trash"></i>Delete</button>
+                        <button type="submit"
+                            class="inline-flex items-center gap-1 text-red-600 hover:text-red-800 text-xs font-medium border border-red-200 rounded px-2 py-1 hover:bg-red-50">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
                     </form>
                     @endif
                 </td>
             </tr>
             @empty
-            <tr>
-                <td colspan="6" class="px-6 py-6 text-center text-gray-400">No users yet.</td>
+            <tr id="emptyRow">
+                <td colspan="6" class="px-6 py-8 text-center text-gray-400">
+                    <i class="bi bi-people text-2xl block mb-2"></i>
+                    No users yet.
+                </td>
             </tr>
             @endforelse
         </tbody>
     </table>
+
+    {{-- No results row (hidden by default) --}}
+    <div id="noResults" class="hidden px-6 py-8 text-center text-gray-400">
+        <i class="bi bi-search text-2xl block mb-2"></i>
+        No users found matching your search.
+    </div>
+
+    {{-- Pagination --}}
+    @if($users->hasPages())
+    <div class="px-6 py-4 border-t flex items-center justify-center gap-2 text-sm">
+
+        @if($users->onFirstPage())
+            <span class="px-3 py-1 rounded border text-gray-300 cursor-not-allowed">← Prev</span>
+        @else
+            <a href="{{ $users->previousPageUrl() }}"
+               class="px-3 py-1 rounded border hover:bg-gray-50 text-gray-600">← Prev</a>
+        @endif
+
+        <span class="px-3 py-1 rounded border bg-blue-700 text-white font-medium">
+            {{ $users->currentPage() }}
+        </span>
+
+        @if($users->hasMorePages())
+            <a href="{{ $users->nextPageUrl() }}"
+               class="px-3 py-1 rounded border hover:bg-gray-50 text-gray-600">Next →</a>
+        @else
+            <span class="px-3 py-1 rounded border text-gray-300 cursor-not-allowed">Next →</span>
+        @endif
+
+    </div>
+    @endif
 </div>
 
 {{-- ADD / EDIT MODAL --}}
@@ -74,7 +129,9 @@
     <div id="userModalBox" class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
 
         <div class="flex justify-between items-center mb-4">
-            <h3 id="modalTitle" class="text-lg font-semibold text-gray-800"><i class="bi bi-plus-lg"></i>Add User</h3>
+            <h3 id="modalTitle" class="text-lg font-semibold text-gray-800">
+                <i class="bi bi-plus-lg"></i> Add User
+            </h3>
             <button type="button" onclick="closeUserModal()" class="text-gray-400 hover:text-gray-600">✕</button>
         </div>
 
@@ -97,13 +154,13 @@
                     <label class="block text-sm text-gray-600 mb-1">Last Name</label>
                     <input type="text" name="last_name" id="field_last_name" required
                            value="{{ old('last_name') }}"
-                           class="w-full border rounded-lg px-3 py-2 text-sm">
+                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                 </div>
                 <div>
                     <label class="block text-sm text-gray-600 mb-1">First Name</label>
                     <input type="text" name="first_name" id="field_first_name" required
                            value="{{ old('first_name') }}"
-                           class="w-full border rounded-lg px-3 py-2 text-sm">
+                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                 </div>
             </div>
 
@@ -111,12 +168,12 @@
                 <label class="block text-sm text-gray-600 mb-1">Middle Name</label>
                 <input type="text" name="middle_name" id="field_middle_name"
                        value="{{ old('middle_name') }}"
-                       class="w-full border rounded-lg px-3 py-2 text-sm">
+                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
 
             <div>
                 <label class="block text-sm text-gray-600 mb-1">Username</label>
-                <div class="flex items-center border rounded-lg overflow-hidden">
+                <div class="flex items-center border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-400">
                     <input type="text" name="username" id="field_username" required
                            value="{{ old('username') }}"
                            placeholder="e.g. juan.delacruz"
@@ -130,7 +187,7 @@
             <div>
                 <label class="block text-sm text-gray-600 mb-1">Role</label>
                 <select name="role" id="field_role" required
-                        class="w-full border rounded-lg px-3 py-2 text-sm">
+                        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                     <option value="adviser">Adviser</option>
                     <option value="principal">Admin</option>
                 </select>
@@ -141,7 +198,7 @@
                     <span class="text-gray-400 text-xs">(minimum 8 characters)</span>
                 </label>
                 <input type="password" name="password" id="field_password"
-                       class="w-full border rounded-lg px-3 py-2 text-sm"
+                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                        placeholder="Enter password">
                 <p id="passwordNote" class="text-xs text-gray-400 mt-1 hidden">
                     Leave blank to keep current password
@@ -150,14 +207,34 @@
 
             <div class="flex justify-end gap-3 pt-2">
                 <button type="button" onclick="closeUserModal()"
-                        class="px-4 py-2 text-sm text-gray-500">Cancel</button>
+                        class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
                 <button type="submit" id="submitBtn"
-                        class="bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium">
+                        class="bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
                     Save User
                 </button>
             </div>
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.getElementById('userSearch').addEventListener('input', function () {
+        const query = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.user-row');
+        let visibleCount = 0;
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(query)) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        document.getElementById('noResults').classList.toggle('hidden', visibleCount > 0);
+    });
+</script>
+@endpush
 
 @endsection

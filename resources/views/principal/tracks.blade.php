@@ -13,16 +13,21 @@
     <div class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg text-sm">{{ session('error') }}</div>
 @endif
 
-<div class="flex justify-end mb-4">
-    <button type="button" onclick="openAddModal()"
-        class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
-        <i class="bi bi-plus-lg"></i>Add Track
-    </button>
-</div>
+<div class="bg-white rounded-xl shadow-sm mb-0">
+    {{-- Header + Add Button --}}
+    <div class="flex items-center justify-between px-6 py-4 border-b">
+        <div>
+            <h2 class="text-sm font-semibold text-gray-800">All Tracks</h2>
+            <p class="text-xs text-gray-400">{{ $tracks->count() }} total tracks</p>
+        </div>
+        <button type="button" onclick="openAddModal()"
+            class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 whitespace-nowrap">
+            <i class="bi bi-plus-lg"></i> Add Track
+        </button>
+    </div>
 
-<div class="bg-white rounded-xl shadow-sm overflow-x-auto">
     <table class="w-full text-sm">
-        <thead class="bg-gray-50 text-gray-500">
+        <thead class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
             <tr>
                 <th class="text-left px-6 py-3">Track Name</th>
                 <th class="text-left px-6 py-3">Code</th>
@@ -49,21 +54,26 @@
                 <td class="px-6 py-3 text-right space-x-2">
                     <button type="button"
                         onclick='openEditModal(@json($track))'
-                        class="text-blue-600 hover:underline text-sm"><i class="bi bi-pencil-square"></i>Edit</button>
-
+                        class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs font-medium border border-blue-200 rounded px-2 py-1 hover:bg-blue-50">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </button>
                     <form method="POST"
                           action="{{ route('principal.tracks.destroy', $track->id) }}"
                           class="inline"
                           onsubmit="return confirm('Delete this track? All specializations under it will also be deleted.');">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="text-red-600 hover:underline text-sm"><i class="bi bi-trash"></i>Delete</button>
+                        <button type="submit"
+                            class="inline-flex items-center gap-1 text-red-600 hover:text-red-800 text-xs font-medium border border-red-200 rounded px-2 py-1 hover:bg-red-50">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
                     </form>
                 </td>
             </tr>
             @empty
             <tr>
-                <td colspan="4" class="px-6 py-6 text-center text-gray-400">
+                <td colspan="4" class="px-6 py-8 text-center text-gray-400">
+                    <i class="bi bi-diagram-3 text-2xl block mb-2"></i>
                     No tracks yet. Add Academic Track and TechPro Track to get started.
                 </td>
             </tr>

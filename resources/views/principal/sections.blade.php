@@ -13,16 +13,28 @@
     <div class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg text-sm">{{ session('error') }}</div>
 @endif
 
-<div class="flex justify-end mb-4">
-    <button type="button" onclick="openAddModal()"
-        class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
-        <i class="bi bi-plus-lg"></i>Add Section
-    </button>
-</div>
+<div class="bg-white rounded-xl shadow-sm mb-0">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 px-6 py-4 border-b">
+        <div>
+            <h2 class="text-sm font-semibold text-gray-800">All Sections</h2>
+            <p class="text-xs text-gray-400">{{ $sections->count() }} total sections</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="relative">
+                <input type="text" id="sectionSearch"
+                    placeholder="Search sections..."
+                    class="border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-56">
+                <i class="bi bi-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
+            </div>
+            <button type="button" onclick="openAddModal()"
+                class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 whitespace-nowrap">
+                <i class="bi bi-plus-lg"></i> Add Section
+            </button>
+        </div>
+    </div>
 
-<div class="bg-white rounded-xl shadow-sm overflow-x-auto">
-    <table class="w-full text-sm">
-        <thead class="bg-gray-50 text-gray-500">
+    <table class="w-full text-sm" id="sectionTable">
+        <thead class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
             <tr>
                 <th class="text-left px-6 py-3">Section Name</th>
                 <th class="text-left px-6 py-3">Grade Level</th>
@@ -36,15 +48,11 @@
         </thead>
         <tbody class="divide-y divide-gray-100">
             @forelse($sections as $section)
-            <tr class="hover:bg-gray-50">
+            <tr class="hover:bg-gray-50 section-row">
                 <td class="px-6 py-3 font-medium text-gray-800">{{ $section->name }}</td>
                 <td class="px-6 py-3 text-gray-600">Grade {{ $section->grade_level }}</td>
-                <td class="px-6 py-3 text-gray-600">
-                    {{ $section->track->name ?? '—' }}
-                </td>
-                <td class="px-6 py-3 text-gray-600">
-                    {{ $section->specialization->name ?? '—' }}
-                </td>
+                <td class="px-6 py-3 text-gray-600">{{ $section->track->name ?? '—' }}</td>
+                <td class="px-6 py-3 text-gray-600">{{ $section->specialization->name ?? '—' }}</td>
                 <td class="px-6 py-3 text-gray-600">{{ $section->school_year }}</td>
                 <td class="px-6 py-3 text-gray-600">
                     @if($section->adviser)
@@ -53,33 +61,41 @@
                         <span class="text-yellow-500 text-xs font-medium">Unassigned</span>
                     @endif
                 </td>
-                <td class="px-6 py-3 text-gray-600">
-                    {{ $section->students->count() }} students
-                </td>
+                <td class="px-6 py-3 text-gray-600">{{ $section->students->count() }} students</td>
                 <td class="px-6 py-3 text-right space-x-2">
                     <button type="button"
                         onclick='openEditModal(@json($section->load(["track", "specialization"])))'
-                        class="text-blue-600 hover:underline text-sm"><i class="bi bi-pencil-square"></i>Edit</button>
-
+                        class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs font-medium border border-blue-200 rounded px-2 py-1 hover:bg-blue-50">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </button>
                     <form method="POST"
                           action="{{ route('principal.sections.destroy', $section->id) }}"
                           class="inline"
                           onsubmit="return confirm('Delete this section?');">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="text-red-600 hover:underline text-sm"><i class="bi bi-trash"></i>Delete</button>
+                        <button type="submit"
+                            class="inline-flex items-center gap-1 text-red-600 hover:text-red-800 text-xs font-medium border border-red-200 rounded px-2 py-1 hover:bg-red-50">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
                     </form>
                 </td>
             </tr>
             @empty
             <tr>
-                <td colspan="8" class="px-6 py-6 text-center text-gray-400">
+                <td colspan="8" class="px-6 py-8 text-center text-gray-400">
+                    <i class="bi bi-grid text-2xl block mb-2"></i>
                     No sections yet.
                 </td>
             </tr>
             @endforelse
         </tbody>
     </table>
+
+    <div id="noSectionResults" class="hidden px-6 py-8 text-center text-gray-400">
+        <i class="bi bi-search text-2xl block mb-2"></i>
+        No sections found matching your search.
+    </div>
 </div>
 
 {{-- ADD / EDIT MODAL --}}
@@ -106,7 +122,6 @@
             @csrf
             <input type="hidden" name="_method" id="sectionMethod" value="POST">
 
-            {{-- Section Name + Grade Level --}}
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm text-gray-600 mb-1">Section Name</label>
@@ -125,7 +140,6 @@
                 </div>
             </div>
 
-            {{-- Track --}}
             <div>
                 <label class="block text-sm text-gray-600 mb-1">Track</label>
                 <select name="track_id" id="sectionTrack" required
@@ -138,7 +152,6 @@
                 </select>
             </div>
 
-            {{-- Specialization — dynamic via AJAX --}}
             <div>
                 <label class="block text-sm text-gray-600 mb-1">Specialization</label>
                 <select name="specialization_id" id="sectionSpec" required
@@ -147,7 +160,6 @@
                 </select>
             </div>
 
-            {{-- School Year --}}
             <div>
                 <label class="block text-sm text-gray-600 mb-1">School Year</label>
                 <input type="text" name="school_year" id="sectionSchoolYear" required
@@ -155,7 +167,6 @@
                        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
 
-            {{-- Adviser --}}
             <div>
                 <label class="block text-sm text-gray-600 mb-1">Assign Adviser</label>
                 <select name="adviser_id" id="sectionAdviser"
@@ -188,6 +199,23 @@
     const SPEC_BY_TRACK_URL = "{{ url('principal/specializations-by-track') }}";
 </script>
 <script src="{{ asset('js/principal/sections.js') }}"></script>
+<script>
+    document.getElementById('sectionSearch').addEventListener('input', function () {
+        const query = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.section-row');
+        let visibleCount = 0;
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(query)) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        document.getElementById('noSectionResults').classList.toggle('hidden', visibleCount > 0);
+    });
+</script>
 @endpush
 
 @endsection
