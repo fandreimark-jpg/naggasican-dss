@@ -1,10 +1,42 @@
 import sys
 import json
+import os
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 
-def classify_with_random_forest(grades_data):
-    # Training data base sa DepEd thresholds
+# Path ng cached model — isinasave sa analytics folder mismo
+MODEL_PATH = os.path.join(os.path.dirname(__file__), 'model_cache.pkl')
+
+def get_model():
+    """
+    I-load ang cached model kung meron.
+    Kung wala pa, i-train at i-save para sa susunod.
+    Dahil dito, isang beses lang nag-retrain — mas mabilis sa production.
+    """
+    try:
+        import joblib
+
+        if os.path.exists(MODEL_PATH):
+            # I-load ang existing trained model
+            return joblib.load(MODEL_PATH)
+
+        # Wala pang cached model — i-train ngayon at i-save
+        model = train_model()
+        joblib.dump(model, MODEL_PATH)
+        return model
+
+    except ImportError:
+        # Walang joblib — i-train na lang without caching
+        return train_model()
+
+
+def train_model():
+    """
+    I-train ang Random Forest classifier base sa DepEd grading thresholds:
+    - Low risk:      90 - 100  (Outstanding / Very Satisfactory)
+    - Moderate risk: 75 - 89   (Satisfactory / Fairly Satisfactory)
+    - High risk:     below 75  (Did Not Meet Expectations)
+    """
     X_train = np.array([
         # Low risk (90-100)
         [90.0], [91.5], [92.0], [93.5], [94.0],
@@ -32,9 +64,15 @@ def classify_with_random_forest(grades_data):
         max_depth=5
     )
     model.fit(X_train, y_train)
+    return model
 
+
+def classify_students(grades_data, model):
+    """
+    I-classify ang bawat student base sa kanilang average grade.
+    """
     label_map = {0: 'low', 1: 'moderate', 2: 'high'}
-    results = []
+    results   = []
 
     for student in grades_data:
         student_id    = student['student_id']
@@ -53,7 +91,6 @@ def classify_with_random_forest(grades_data):
 
 
 def main():
-    # Tatanggap na ng file paths, hindi raw JSON string
     if len(sys.argv) < 3:
         print('Usage: classify.py <input_file> <output_file>')
         return
@@ -61,6 +98,7 @@ def main():
     input_file  = sys.argv[1]
     output_file = sys.argv[2]
 
+    # I-load ang grades data
     try:
         with open(input_file, 'r') as f:
             grades_data = json.load(f)
@@ -71,8 +109,11 @@ def main():
     if not grades_data:
         results = []
     else:
-        results = classify_with_random_forest(grades_data)
+        # I-load o i-train ang model (cached kung available)
+        model   = get_model()
+        results = classify_students(grades_data, model)
 
+    # I-save ang results
     try:
         with open(output_file, 'w') as f:
             json.dump(results, f)

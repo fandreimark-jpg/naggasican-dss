@@ -1,8 +1,22 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Adviser\AdviserController;
-use App\Http\Controllers\Principal\PrincipalController;
+// Adviser controllers
+use App\Http\Controllers\Adviser\DashboardController as AdviserDashboardController;
+use App\Http\Controllers\Adviser\StudentController as AdviserStudentController;
+use App\Http\Controllers\Adviser\GradeController as AdviserGradeController;
+use App\Http\Controllers\Adviser\ReportController as AdviserReportController;
+
+// Principal controllers
+use App\Http\Controllers\Principal\DashboardController;
+use App\Http\Controllers\Principal\UserController;
+use App\Http\Controllers\Principal\TrackController;
+use App\Http\Controllers\Principal\SpecializationController;
+use App\Http\Controllers\Principal\SubjectController;
+use App\Http\Controllers\Principal\SectionController;
+use App\Http\Controllers\Principal\StudentController;
+use App\Http\Controllers\Principal\ReportController;
+use App\Http\Controllers\Principal\ActivityLogController;
 
 // Root redirect
 Route::get('/', function () {
@@ -29,20 +43,18 @@ Route::middleware(['auth', 'role:adviser'])
     ->prefix('adviser')
     ->name('adviser.')
     ->group(function () {
-        Route::get('/dashboard', [AdviserController::class, 'dashboard'])->name('dashboard');
-        Route::get('/students', [AdviserController::class, 'students'])->name('students');
-        Route::get('/students/{id}/edit', [AdviserController::class, 'editStudent'])->name('students.edit');
-        Route::put('/students/{id}', [AdviserController::class, 'updateStudent'])->name('students.update');
-        Route::get('/grades', [AdviserController::class, 'grades'])->name('grades');
-        Route::post('/grades', [AdviserController::class, 'storeGrade'])->name('grades.store');
-
-        // Submit Report
-        Route::get('/submit-report', [AdviserController::class, 'showSubmitReport'])->name('submit.report');
-        Route::post('/submit-report', [AdviserController::class, 'submitReport'])->name('submit.report.post');
+        Route::get('/dashboard',          [AdviserDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/students',           [AdviserStudentController::class, 'index'])->name('students');
+        Route::get('/students/{id}/edit', [AdviserStudentController::class, 'edit'])->name('students.edit');
+        Route::put('/students/{id}',      [AdviserStudentController::class, 'update'])->name('students.update');
+        Route::get('/grades',             [AdviserGradeController::class, 'index'])->name('grades');
+        Route::post('/grades',            [AdviserGradeController::class, 'store'])->name('grades.store');
+        Route::get('/submit-report',      [AdviserReportController::class, 'show'])->name('submit.report');
+        Route::post('/submit-report',     [AdviserReportController::class, 'submit'])->name('submit.report.post');
     });
 
 // =============================================
-// PRINCIPAL / ADMIN ROUTES
+// PRINCIPAL ROUTES
 // =============================================
 Route::middleware(['auth', 'role:principal'])
     ->prefix('principal')
@@ -50,52 +62,53 @@ Route::middleware(['auth', 'role:principal'])
     ->group(function () {
 
         // Dashboard
-        Route::get('/dashboard', [PrincipalController::class, 'dashboard'])->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // User Management
-        Route::get('/users', [PrincipalController::class, 'users'])->name('users');
-        Route::post('/users', [PrincipalController::class, 'storeUser'])->name('users.store');
-        Route::get('/users/{id}/edit', [PrincipalController::class, 'editUser'])->name('users.edit');
-        Route::put('/users/{id}', [PrincipalController::class, 'updateUser'])->name('users.update');
-        Route::delete('/users/{id}', [PrincipalController::class, 'destroyUser'])->name('users.destroy');
+        Route::get('/users',            [UserController::class, 'index'])->name('users');
+        Route::post('/users',           [UserController::class, 'store'])->name('users.store');
+        Route::get('/users/{id}/edit',  [UserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{id}',       [UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{id}',    [UserController::class, 'destroy'])->name('users.destroy');
+
+        // Tracks Management
+        Route::get('/tracks',           [TrackController::class, 'index'])->name('tracks');
+        Route::post('/tracks',          [TrackController::class, 'store'])->name('tracks.store');
+        Route::put('/tracks/{id}',      [TrackController::class, 'update'])->name('tracks.update');
+        Route::delete('/tracks/{id}',   [TrackController::class, 'destroy'])->name('tracks.destroy');
+
+        // Specializations Management
+        Route::get('/specializations',          [SpecializationController::class, 'index'])->name('specializations');
+        Route::post('/specializations',         [SpecializationController::class, 'store'])->name('specializations.store');
+        Route::put('/specializations/{id}',     [SpecializationController::class, 'update'])->name('specializations.update');
+        Route::delete('/specializations/{id}',  [SpecializationController::class, 'destroy'])->name('specializations.destroy');
+
+        // AJAX — Specializations by Track (for dropdowns)
+        Route::get('/specializations-by-track/{trackId}', [SpecializationController::class, 'byTrack'])->name('specializations.by.track');
+
+        // Subjects Management
+        Route::get('/subjects',         [SubjectController::class, 'index'])->name('subjects');
+        Route::post('/subjects',        [SubjectController::class, 'store'])->name('subjects.store');
+        Route::put('/subjects/{id}',    [SubjectController::class, 'update'])->name('subjects.update');
+        Route::delete('/subjects/{id}', [SubjectController::class, 'destroy'])->name('subjects.destroy');
 
         // Sections Management
-        Route::get('/sections', [PrincipalController::class, 'sections'])->name('sections');
-        Route::post('/sections', [PrincipalController::class, 'storeSection'])->name('sections.store');
-        Route::put('/sections/{id}', [PrincipalController::class, 'updateSection'])->name('sections.update');
-        Route::delete('/sections/{id}', [PrincipalController::class, 'destroySection'])->name('sections.destroy');
-
-        // ✅ BAGO — Tracks Management
-        Route::get('/tracks', [PrincipalController::class, 'tracks'])->name('tracks');
-        Route::post('/tracks', [PrincipalController::class, 'storeTrack'])->name('tracks.store');
-        Route::put('/tracks/{id}', [PrincipalController::class, 'updateTrack'])->name('tracks.update');
-        Route::delete('/tracks/{id}', [PrincipalController::class, 'destroyTrack'])->name('tracks.destroy');
-
-        // ✅ BAGO — Specializations Management
-        Route::get('/specializations', [PrincipalController::class, 'specializations'])->name('specializations');
-        Route::post('/specializations', [PrincipalController::class, 'storeSpecialization'])->name('specializations.store');
-        Route::put('/specializations/{id}', [PrincipalController::class, 'updateSpecialization'])->name('specializations.update');
-        Route::delete('/specializations/{id}', [PrincipalController::class, 'destroySpecialization'])->name('specializations.destroy');
-
-        // ✅ BAGO — Subjects Management
-        Route::get('/subjects', [PrincipalController::class, 'subjects'])->name('subjects');
-        Route::post('/subjects', [PrincipalController::class, 'storeSubject'])->name('subjects.store');
-        Route::put('/subjects/{id}', [PrincipalController::class, 'updateSubject'])->name('subjects.update');
-        Route::delete('/subjects/{id}', [PrincipalController::class, 'destroySubject'])->name('subjects.destroy');
+        Route::get('/sections',         [SectionController::class, 'index'])->name('sections');
+        Route::post('/sections',        [SectionController::class, 'store'])->name('sections.store');
+        Route::put('/sections/{id}',    [SectionController::class, 'update'])->name('sections.update');
+        Route::delete('/sections/{id}', [SectionController::class, 'destroy'])->name('sections.destroy');
 
         // Students Management
-        Route::get('/students', [PrincipalController::class, 'students'])->name('students');
-        Route::post('/students', [PrincipalController::class, 'storeStudent'])->name('students.store');
-        Route::put('/students/{id}', [PrincipalController::class, 'updateStudent'])->name('students.update');
-        Route::delete('/students/{id}', [PrincipalController::class, 'destroyStudent'])->name('students.destroy');
+        Route::get('/students',         [StudentController::class, 'index'])->name('students');
+        Route::post('/students',        [StudentController::class, 'store'])->name('students.store');
+        Route::put('/students/{id}',    [StudentController::class, 'update'])->name('students.update');
+        Route::delete('/students/{id}', [StudentController::class, 'destroy'])->name('students.destroy');
 
         // Reports
-        Route::get('/reports', [PrincipalController::class, 'reports'])->name('reports');
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports');
 
-        // ✅ BAGO — AJAX route para sa specializations dropdown
-        Route::get('/specializations-by-track/{trackId}', [PrincipalController::class, 'getSpecializationsByTrack'])->name('specializations.by.track');
         // Activity Logs
-        Route::get('/activity-logs', [PrincipalController::class, 'activityLogs'])->name('activity.logs');
+        Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity.logs');
     });
 
 require __DIR__.'/auth.php';
