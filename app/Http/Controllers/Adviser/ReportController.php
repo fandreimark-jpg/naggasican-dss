@@ -26,63 +26,48 @@ class ReportController extends Controller
                 'submissions'  => collect(),
                 'gradeSummary' => collect(),
                 'subjects'     => collect(),
+                'termStatus'   => [],
+                'totalExpected'=> 0,
             ]);
         }
 
-        $subjects = $this->getSectionSubjects($section);
+        $subjects  = $this->getSectionSubjects($section);
+        $students  = Student::where('section_id', $section->id)
+            ->orderBy('last_name')
+            ->get();
+
+        $totalExpected = $students->count() * $subjects->count();
 
         $submissions = ReportSubmission::where('section_id', $section->id)
             ->where('school_year', $section->school_year)
             ->get()
             ->keyBy('grading_period');
 
-        $students = Student::where('section_id', $section->id)
-            ->orderBy('last_name')
+        $allGrades = Grade::where('section_id', $section->id)
+            ->where('school_year', $section->school_year)
             ->get();
 
-        $totalExpected = $students->count() * $subjects->count();
+        $gradeSummary = $students->map(function ($student) use ($allGrades) {
+            $studentGrades = $allGrades->where('student_id', $student->id);
 
-        $gradeSummary = $students->map(function ($student) use ($section) {
-            $termAverages = [];
-            foreach ([1, 2, 3] as $term) {
-                $grades = Grade::where('student_id', $student->id)
-                    ->where('section_id', $section->id)
-                    ->where('grading_period', $term)
-                    ->where('school_year', $section->school_year)
-                    ->pluck('grade');
+            $term1 = $studentGrades->where('grading_period', 1)->avg('grade');
+            $term2 = $studentGrades->where('grading_period', 2)->avg('grade');
+            $term3 = $studentGrades->where('grading_period', 3)->avg('grade');
 
-                $termAverages[$term] = $grades->count() > 0
-                    ? round($grades->avg(), 2)
-                    : null;
-            }
-
-            $allGrades   = array_filter($termAverages);
-            $overallAvg  = count($allGrades) > 0
-                ? round(array_sum($allGrades) / count($allGrades), 2)
-                : null;
-
-            $hasFailingGrade = Grade::where('student_id', $student->id)
-                ->where('section_id', $section->id)
-                ->where('school_year', $section->school_year)
-                ->where('grade', '<', 75)
-                ->exists();
+            $hasFailingGrade = $studentGrades->where('grade', '<', 75)->count() > 0;
 
             return [
-                'student'          => $student,
-                'term1'            => $termAverages[1],
-                'term2'            => $termAverages[2],
-                'term3'            => $termAverages[3],
-                'overall_average'  => $overallAvg,
-                'has_failing'      => $hasFailingGrade,
+                'student'         => $student,
+                'term1'           => $term1 ? round($term1, 2) : null,
+                'term2'           => $term2 ? round($term2, 2) : null,
+                'term3'           => $term3 ? round($term3, 2) : null,
+                'has_failing'     => $hasFailingGrade,
             ];
         });
 
         $termStatus = [];
         foreach ([1, 2, 3] as $term) {
-            $encoded = Grade::where('section_id', $section->id)
-                ->where('grading_period', $term)
-                ->where('school_year', $section->school_year)
-                ->count();
+            $encoded = $allGrades->where('grading_period', $term)->count();
 
             $termStatus[$term] = [
                 'encoded'    => $encoded,
@@ -107,7 +92,7 @@ class ReportController extends Controller
             'grading_period' => 'required|in:1,2,3',
         ]);
 
-        $gradingPeriod = $request->grading_period;
+        $gradingPeriod = (int) $request->grading_period;
         $subjects      = $this->getSectionSubjects($section);
         $students      = Student::where('section_id', $section->id)->get();
         $totalExpected = $students->count() * $subjects->count();
@@ -124,26 +109,26 @@ class ReportController extends Controller
             );
         }
 
-        // Build grades data for Python classifier
-        $gradesData = $students->map(function ($student) use ($section, $gradingPeriod) {
-            $grades = Grade::where('student_id', $student->id)
-                ->where('section_id', $section->id)
-                ->where('grading_period', $gradingPeriod)
-                ->where('school_year', $section->school_year)
-                ->pluck('grade');
+        $termGrades = Grade::where('section_id', $section->id)
+            ->where('grading_period', $gradingPeriod)
+            ->where('school_year', $section->school_year)
+            ->get()
+            ->groupBy('student_id');
+
+        $gradesData = $students->map(function ($student) use ($termGrades) {
+            $studentGrades = $termGrades->get($student->id, collect());
+            $avg = $studentGrades->count() > 0
+                ? round($studentGrades->avg('grade'), 2)
+                : 0;
 
             return [
                 'student_id'    => $student->id,
-                'average_grade' => $grades->count() > 0
-                    ? round($grades->avg(), 2)
-                    : 0,
+                'average_grade' => $avg,
             ];
         })->toArray();
 
-        // Run Python risk classifier
         $this->runAnalytics($gradesData, $section, $gradingPeriod);
 
-        // Record the submission
         ReportSubmission::updateOrCreate(
             [
                 'section_id'     => $section->id,
@@ -173,8 +158,8 @@ class ReportController extends Controller
 
     private function runAnalytics(array $gradesData, Section $section, int $gradingPeriod): void
     {
-        $tempFile   = storage_path('app/temp_grades.json');
-        $outputFile = storage_path('app/temp_results.json');
+        $tempFile   = storage_path('app/temp_grades_' . $section->id . '.json');
+        $outputFile = storage_path('app/temp_results_' . $section->id . '.json');
 
         file_put_contents($tempFile, json_encode($gradesData));
 
@@ -200,7 +185,7 @@ class ReportController extends Controller
         $results = json_decode($raw, true);
 
         if (json_last_error() !== JSON_ERROR_NONE || !$results) {
-            \Log::error('JSON decode error from Python output: ' . json_last_error_msg());
+            \Log::error('JSON decode error: ' . json_last_error_msg());
             return;
         }
 

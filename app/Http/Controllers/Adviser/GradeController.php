@@ -75,6 +75,12 @@ class GradeController extends Controller
             'grades.*.grade'          => 'nullable|numeric|min:60|max:100',
         ]);
 
+        // ✅ FIXED: Pre-load valid student IDs — isang query lang
+        // Hindi na nagtatanong sa database sa loob ng loop (no N+1)
+        $validStudentIds = Student::where('section_id', $section->id)
+            ->pluck('id')
+            ->toArray();
+
         foreach ($request->grades as $gradeData) {
             // Skip kung walang grade value
             if (!isset($gradeData['grade']) || $gradeData['grade'] === null || $gradeData['grade'] === '') {
@@ -82,11 +88,7 @@ class GradeController extends Controller
             }
 
             // Verify student belongs to adviser's section — security check
-            $belongsToSection = Student::where('id', $gradeData['student_id'])
-                ->where('section_id', $section->id)
-                ->exists();
-
-            if (!$belongsToSection) continue;
+            if (!in_array($gradeData['student_id'], $validStudentIds)) continue;
 
             Grade::updateOrCreate(
                 [
