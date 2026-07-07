@@ -7,8 +7,16 @@ use App\Models\Specialization;
 use App\Models\Track;
 use Illuminate\Http\Request;
 
+/**
+ * SpecializationController (Principal)
+ *
+ * Manages SHS specializations under each track.
+ * Examples: HUMSS, STEM, ABM under Academic Track.
+ *           ICT, HE under Technical-Professional Track.
+ */
 class SpecializationController extends Controller
 {
+    /** Show all specializations with their parent track. */
     public function index()
     {
         $specializations = Specialization::with('track')->orderBy('name')->get();
@@ -16,6 +24,7 @@ class SpecializationController extends Controller
         return view('principal.specializations', compact('specializations', 'tracks'));
     }
 
+    /** Create a new specialization under a track. */
     public function store(Request $request)
     {
         $request->validate([
@@ -27,13 +36,14 @@ class SpecializationController extends Controller
         Specialization::create([
             'track_id' => $request->track_id,
             'name'     => $request->name,
-            'code'     => strtoupper($request->code),
+            'code'     => strtoupper($request->code), // auto-uppercase
         ]);
 
         return redirect()->route('principal.specializations')
             ->with('success', 'Specialization added successfully!');
     }
 
+    /** Update an existing specialization. */
     public function update(Request $request, $id)
     {
         $specialization = Specialization::findOrFail($id);
@@ -54,6 +64,10 @@ class SpecializationController extends Controller
             ->with('success', 'Specialization updated successfully!');
     }
 
+    /**
+     * Delete a specialization.
+     * Cannot delete if sections are using this specialization.
+     */
     public function destroy($id)
     {
         $specialization = Specialization::findOrFail($id);
@@ -69,11 +83,16 @@ class SpecializationController extends Controller
             ->with('success', 'Specialization deleted successfully!');
     }
 
+    /**
+     * AJAX endpoint — returns specializations for a specific track.
+     * Used by the section and subject forms to populate the specialization dropdown
+     * when a track is selected.
+     */
     public function byTrack($trackId)
     {
         $specializations = Specialization::where('track_id', $trackId)
             ->orderBy('name')
-            ->get(['id', 'name', 'code']);
+            ->get(['id', 'name', 'code']); // only return needed fields
 
         return response()->json($specializations);
     }

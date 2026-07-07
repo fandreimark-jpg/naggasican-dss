@@ -8,12 +8,24 @@ use App\Models\Section;
 use App\Helpers\LogActivity;
 use Illuminate\Http\Request;
 
+/**
+ * StudentController (Principal)
+ *
+ * Full CRUD management of student records.
+ * Only the Principal can add or remove students.
+ * Advisers can only view and edit basic student info.
+ */
 class StudentController extends Controller
 {
+    /**
+     * Show all students with optional section filter.
+     * Paginated at 10 per page for performance.
+     */
     public function index()
     {
         $query = Student::with(['section'])->orderBy('last_name');
 
+        // Filter by section if selected in dropdown
         if (request('section_id')) {
             $query->where('section_id', request('section_id'));
         }
@@ -26,6 +38,10 @@ class StudentController extends Controller
         return view('principal.students', compact('students', 'sections'));
     }
 
+    /**
+     * Add a new student.
+     * LRN must be unique — 12 digits exactly.
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -54,6 +70,10 @@ class StudentController extends Controller
             ->with('success', 'Student added successfully!');
     }
 
+    /**
+     * Update student information.
+     * LRN uniqueness check excludes the current student.
+     */
     public function update(Request $request, $id)
     {
         $student = Student::findOrFail($id);
@@ -77,6 +97,10 @@ class StudentController extends Controller
             ->with('success', 'Student updated successfully!');
     }
 
+    /**
+     * Delete a student record.
+     * Related grades and risk results are deleted via cascade in the database.
+     */
     public function destroy($id)
     {
         $student = Student::findOrFail($id);

@@ -10,23 +10,37 @@ use App\Models\User;
 use App\Helpers\LogActivity;
 use Illuminate\Http\Request;
 
+/**
+ * SectionController (Principal)
+ *
+ * Manages class sections — creating, updating, and deleting sections.
+ * Each section is assigned to one adviser and belongs to one track/specialization.
+ */
 class SectionController extends Controller
 {
+    /**
+     * Show all sections with their related data.
+     * Available advisers = advisers who are NOT yet assigned to any section.
+     */
     public function index()
     {
         $sections = Section::with(['adviser', 'students', 'track', 'specialization'])
             ->orderBy('grade_level')
             ->get();
 
+        // Get IDs of advisers already assigned to a section
         $assignedAdviserIds = Section::whereNotNull('adviser_id')
             ->pluck('adviser_id')
             ->toArray();
 
+        // Only show unassigned advisers in the Add dropdown
+        // Prevents assigning one adviser to multiple sections
         $availableAdvisers = User::where('role', 'adviser')
             ->whereNotIn('id', $assignedAdviserIds)
             ->orderBy('last_name')
             ->get();
 
+        // All advisers shown in Edit dropdown (including currently assigned)
         $allAdvisers = User::where('role', 'adviser')
             ->orderBy('last_name')
             ->get();
@@ -40,6 +54,10 @@ class SectionController extends Controller
         ));
     }
 
+    /**
+     * Create a new section.
+     * Adviser assignment is optional — section can exist without an adviser.
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -60,17 +78,16 @@ class SectionController extends Controller
             'adviser_id'        => $request->adviser_id ?: null,
         ]);
 
-        LogActivity::log(
-            'create_section',
-            'Created section: ' . $request->name,
-            'sections',
-            null
-        );
+        LogActivity::log('create_section', 'Created section: ' . $request->name, 'sections', null);
 
         return redirect()->route('principal.sections')
             ->with('success', 'Section created successfully!');
     }
 
+    /**
+     * Update an existing section.
+     * Checks if the selected adviser is already assigned to another section.
+     */
     public function update(Request $request, $id)
     {
         $section   = Section::findOrFail($id);
@@ -85,9 +102,10 @@ class SectionController extends Controller
             'adviser_id'        => 'nullable|exists:users,id',
         ]);
 
+        // Prevent assigning an adviser who is already assigned to another section
         if ($adviserId) {
             $existingSection = Section::where('adviser_id', $adviserId)
-                ->where('id', '!=', $id)
+                ->where('id', '!=', $id) // exclude current section from check
                 ->first();
 
             if ($existingSection) {
@@ -110,10 +128,15 @@ class SectionController extends Controller
             ->with('success', 'Section updated successfully!');
     }
 
+    /**
+     * Delete a section.
+     * Cannot delete a section that still has students enrolled.
+     */
     public function destroy($id)
     {
         $section = Section::findOrFail($id);
 
+        // Prevent deletion if section has students
         if ($section->students()->count() > 0) {
             return redirect()->route('principal.sections')
                 ->with('error', 'Cannot delete section with existing students.');

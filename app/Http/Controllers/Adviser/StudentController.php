@@ -7,10 +7,21 @@ use App\Models\Student;
 use App\Models\Section;
 use Illuminate\Http\Request;
 
+/**
+ * StudentController (Adviser)
+ *
+ * Allows the adviser to view and edit students in their own section.
+ * Advisers CANNOT add or remove students — only the Principal can do that.
+ * Scoped to the adviser's section for security.
+ */
 class StudentController extends Controller
 {
+    /**
+     * Show all students in the adviser's section.
+     */
     public function index()
     {
+        // Get only the section assigned to this adviser
         $section  = Section::where('adviser_id', auth()->id())->first();
         $students = $section
             ? Student::where('section_id', $section->id)->orderBy('last_name')->get()
@@ -19,9 +30,15 @@ class StudentController extends Controller
         return view('adviser.students', compact('students', 'section'));
     }
 
+    /**
+     * Show edit form for a specific student.
+     * Verifies the student belongs to the adviser's section before showing.
+     */
     public function edit($id)
     {
         $section = Section::where('adviser_id', auth()->id())->first();
+
+        // Security check — ensure student belongs to adviser's section
         $student = Student::where('id', $id)
             ->where('section_id', $section->id)
             ->firstOrFail();
@@ -29,9 +46,15 @@ class StudentController extends Controller
         return view('adviser.students-edit', compact('student', 'section'));
     }
 
+    /**
+     * Update a student's basic information.
+     * Advisers can only update personal info — not LRN or section.
+     */
     public function update(Request $request, $id)
     {
         $section = Section::where('adviser_id', auth()->id())->first();
+
+        // Security check — ensure student belongs to adviser's section
         $student = Student::where('id', $id)
             ->where('section_id', $section->id)
             ->firstOrFail();

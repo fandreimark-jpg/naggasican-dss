@@ -6,14 +6,26 @@ use App\Http\Controllers\Controller;
 use App\Models\Track;
 use Illuminate\Http\Request;
 
+/**
+ * TrackController (Principal)
+ *
+ * Manages SHS tracks — Academic Track and Technical-Professional Track.
+ * Tracks are the top-level category for sections and specializations.
+ */
 class TrackController extends Controller
 {
+    /** Show all tracks with their specializations. */
     public function index()
     {
         $tracks = Track::with('specializations')->orderBy('name')->get();
         return view('principal.tracks', compact('tracks'));
     }
 
+    /**
+     * Create a new track.
+     * Code is auto-uppercased (e.g. 'acad' → 'ACAD').
+     * Name and code must be unique.
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -30,6 +42,10 @@ class TrackController extends Controller
             ->with('success', 'Track added successfully!');
     }
 
+    /**
+     * Update a track.
+     * Uniqueness check excludes the current track being edited.
+     */
     public function update(Request $request, $id)
     {
         $track = Track::findOrFail($id);
@@ -48,6 +64,10 @@ class TrackController extends Controller
             ->with('success', 'Track updated successfully!');
     }
 
+    /**
+     * Delete a track.
+     * Cannot delete if sections are using this track.
+     */
     public function destroy($id)
     {
         $track = Track::findOrFail($id);

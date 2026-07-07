@@ -10,21 +10,38 @@ use App\Helpers\LogActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
+/**
+ * UserController (Principal)
+ *
+ * Handles all user account management.
+ * Only the Principal can create, update, and delete accounts.
+ * Public registration is disabled — all accounts are created here.
+ */
 class UserController extends Controller
 {
+    /**
+     * Show all user accounts.
+     * Excludes the currently logged-in principal to prevent self-deletion.
+     */
     public function index()
     {
         $users = User::where('id', '!=', auth()->id())
-            ->with('section')
-            ->orderBy('role')
-            ->orderBy('name')
+            ->with('section')       // eager load section to avoid N+1 queries
+            ->orderBy('role')       // principals first, then advisers
+            ->orderBy('name')       // alphabetical within each role
             ->paginate(10);
 
         return view('principal.users', compact('users'));
     }
 
+    /**
+     * Store a new user account.
+     * Email is auto-generated: username@naggasican.edu.ph
+     * Password is hashed using bcrypt via Hash::make()
+     */
     public function store(Request $request)
     {
+        // Validate all required fields
         $request->validate([
             'last_name'   => 'required|string|max:255',
             'first_name'  => 'required|string|max:255',
@@ -34,12 +51,15 @@ class UserController extends Controller
             'role'        => 'required|in:adviser,principal',
         ]);
 
+        // Build email from username
         $email = $request->username . '@naggasican.edu.ph';
 
+        // Check if username is already taken
         if (User::where('email', $email)->exists()) {
             return back()->withErrors(['username' => 'This username is already taken.'])->withInput();
         }
 
+        // Format: Last Name, First Name
         $fullName = $request->last_name . ', ' . $request->first_name;
 
         User::create([
@@ -48,10 +68,11 @@ class UserController extends Controller
             'first_name'  => $request->first_name,
             'middle_name' => $request->middle_name,
             'email'       => $email,
-            'password'    => Hash::make($request->password),
+            'password'    => Hash::make($request->password), // never store plain text
             'role'        => $request->role,
         ]);
 
+        // Record action in activity logs
         LogActivity::log(
             'create_user',
             'Created ' . $request->role . ' account: ' . $request->last_name . ', ' . $request->first_name,
@@ -63,13 +84,21 @@ class UserController extends Controller
             ->with('success', ucfirst($request->role) . ' account created successfully!');
     }
 
+    /**
+     * Show edit form for a specific user.
+     * Only adviser accounts are editable via this route.
+     */
     public function edit($id)
     {
-        $user     = User::where('id', $id)->where('role', 'adviser')->firstOrFail();
+        $user     = User::where('id', $id)->firstOrFail();
         $sections = Section::all();
         return view('principal.users-edit', compact('user', 'sections'));
     }
 
+    /**
+     * Update an existing user account.
+     * Password is only updated if a new one is provided.
+     */
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -85,6 +114,7 @@ class UserController extends Controller
 
         $email = $request->username . '@naggasican.edu.ph';
 
+        // Check uniqueness — exclude current user from check
         if (User::where('email', $email)->where('id', '!=', $user->id)->exists()) {
             return back()->withErrors(['username' => 'This username is already taken.'])->withInput();
         }
@@ -95,9 +125,8 @@ class UserController extends Controller
             'first_name'  => $request->first_name,
             'middle_name' => $request->middle_name,
             'email'       => $email,
-            'password'    => $request->password
-                ? Hash::make($request->password)
-                : $user->password,
+            // Keep existing password if no new password provided
+            'password'    => $request->password ? Hash::make($request->password) : $user->password,
             'role'        => $request->role,
         ]);
 
@@ -105,17 +134,27 @@ class UserController extends Controller
             ->with('success', 'User updated successfully!');
     }
 
+    /**
+     * Delete a user account.
+     * Unassigns them from any section before deleting.
+     * Cannot delete your own account.
+     */
     public function destroy($id)
     {
         $user = User::where('id', $id)->firstOrFail();
 
+        // Prevent self-deletion
         if ($user->id === auth()->id()) {
             return redirect()->route('principal.users')
                 ->with('error', 'You cannot delete your own account.');
         }
 
+        // Unassign adviser from their section before deleting
         Section::where('adviser_id', $user->id)->update(['adviser_id' => null]);
+
+        // Set encoded_by to null for grades they encoded
         Grade::where('encoded_by', $user->id)->update(['encoded_by' => null]);
+
         $user->delete();
 
         return redirect()->route('principal.users')

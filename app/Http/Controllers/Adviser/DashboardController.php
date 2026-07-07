@@ -9,24 +9,36 @@ use App\Models\Grade;
 use App\Models\Section;
 use App\Models\ReportSubmission;
 
+/**
+ * DashboardController (Adviser)
+ *
+ * Handles the Adviser Dashboard.
+ * Shows the adviser's section overview — total students,
+ * grades encoded, pending submissions, and student risk levels.
+ */
 class DashboardController extends Controller
 {
     public function index()
     {
+        // Get the section assigned to the logged-in adviser
         $section = Section::where('adviser_id', auth()->id())
-                        ->with(['track', 'specialization'])
-                        ->first();
+            ->with(['track', 'specialization'])
+            ->first();
 
+        // If no section assigned — show empty dashboard
         $totalStudents = $section
             ? Student::where('section_id', $section->id)->count()
             : 0;
 
+        // Get subjects for this section (core + elective filtered by track/spec)
         $subjects = $section
             ? $this->getSectionSubjects($section)
             : collect();
 
+        // Total grades expected per term = students × subjects
         $totalExpectedPerTerm = $totalStudents * $subjects->count();
 
+        // Count grades encoded per term — used for progress tracking
         $term1Count = $section ? Grade::where('section_id', $section->id)
             ->where('grading_period', 1)
             ->where('school_year', $section->school_year)
@@ -44,11 +56,13 @@ class DashboardController extends Controller
 
         $totalGradesEncoded = $term1Count + $term2Count + $term3Count;
 
+        // Load submissions keyed by grading_period for easy lookup in the view
         $submissions = $section ? ReportSubmission::where('section_id', $section->id)
             ->where('school_year', $section->school_year)
             ->get()
             ->keyBy('grading_period') : collect();
 
+        // Count terms that are complete but not yet submitted
         $pendingCount = 0;
         foreach ([1, 2, 3] as $term) {
             $termCount = match($term) {
@@ -63,11 +77,12 @@ class DashboardController extends Controller
             }
         }
 
+        // Load students with their latest risk results for the overview table
         $students = $section
             ? Student::where('section_id', $section->id)
                 ->with(['riskResults' => function ($q) use ($section) {
                     $q->where('school_year', $section->school_year)
-                      ->orderBy('grading_period', 'desc');
+                      ->orderBy('grading_period', 'desc'); // latest term first
                 }])
                 ->orderBy('last_name')
                 ->get()
@@ -81,6 +96,10 @@ class DashboardController extends Controller
         ));
     }
 
+    /**
+     * Get subjects for a section filtered by grade level, track, and specialization.
+     * Core subjects apply to all sections. Elective subjects are track/spec specific.
+     */
     private function getSectionSubjects(Section $section)
     {
         return Subject::where('grade_level', $section->grade_level)

@@ -22,35 +22,47 @@ class AuthenticatedSessionController extends Controller
 
     /**
      * Handle an incoming authentication request.
+     * Authenticates the user, logs the login action,
+     * then redirects based on role.
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+        // Authenticate credentials — throws exception if invalid
         $request->authenticate();
+
+        // Regenerate session ID to prevent session fixation attacks
         $request->session()->regenerate();
 
         $user = auth()->user();
 
+        // Log login action for ALL users — principal and adviser
+        LogActivity::log(
+            action:      'login',
+            description: $user->name . ' logged in',
+            tableName:   'users',
+            recordId:    $user->id
+        );
+
+        // Redirect to correct dashboard based on role
         if ($user->isPrincipal()) {
             return redirect()->route('principal.dashboard');
         }
-        LogActivity::log(
-            action:      'login',
-            description: auth()->user()->name . ' logged in',
-            tableName:   'users',
-            recordId:    auth()->id()
-        );
+
         return redirect()->route('adviser.dashboard');
     }
 
     /**
-     * Destroy an authenticated session.
+     * Destroy an authenticated session (logout).
+     * Invalidates session and regenerates CSRF token.
      */
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
 
+        // Invalidate the session — clears all session data
         $request->session()->invalidate();
 
+        // Regenerate CSRF token for security
         $request->session()->regenerateToken();
 
         return redirect('/');

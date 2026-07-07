@@ -8,14 +8,25 @@ use App\Models\Track;
 use App\Models\Specialization;
 use Illuminate\Http\Request;
 
+/**
+ * SubjectController (Principal)
+ *
+ * Manages SHS subjects — both core and elective.
+ * Core subjects apply to all sections of a grade level.
+ * Elective subjects are tied to a specific track and optionally a specialization.
+ */
 class SubjectController extends Controller
 {
+    /**
+     * Show all subjects with optional type filter (core/elective).
+     * URL: /principal/subjects?type=core or ?type=elective
+     */
     public function index()
     {
         $subjects = Subject::with(['track', 'specialization'])
             ->when(request('type'), fn($q) => $q->where('type', request('type')))
             ->orderBy('grade_level')
-            ->orderBy('type')
+            ->orderBy('type') // core subjects first
             ->orderBy('name')
             ->get();
 
@@ -25,6 +36,11 @@ class SubjectController extends Controller
         return view('principal.subjects', compact('subjects', 'tracks', 'specializations'));
     }
 
+    /**
+     * Create a new subject.
+     * Track and specialization are only saved for elective subjects.
+     * Core subjects have null track_id and specialization_id.
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -39,6 +55,7 @@ class SubjectController extends Controller
             'name'              => $request->name,
             'type'              => $request->type,
             'grade_level'       => $request->grade_level,
+            // Only elective subjects have track/specialization
             'track_id'          => $request->type === 'elective' ? $request->track_id : null,
             'specialization_id' => $request->type === 'elective' ? $request->specialization_id : null,
         ]);
@@ -47,6 +64,7 @@ class SubjectController extends Controller
             ->with('success', 'Subject added successfully!');
     }
 
+    /** Update an existing subject. */
     public function update(Request $request, $id)
     {
         $subject = Subject::findOrFail($id);
@@ -71,6 +89,10 @@ class SubjectController extends Controller
             ->with('success', 'Subject updated successfully!');
     }
 
+    /**
+     * Delete a subject.
+     * Cannot delete if grades have been recorded for this subject.
+     */
     public function destroy($id)
     {
         $subject = Subject::findOrFail($id);

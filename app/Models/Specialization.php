@@ -4,23 +4,46 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Specialization Model
+ *
+ * Represents a SHS specialization under a track.
+ * Examples:
+ * - Academic Track: HUMSS, STEM, ABM
+ * - Technical-Professional Track: ICT, HE
+ *
+ * Each section belongs to one specialization.
+ * Elective subjects can be tied to a specific specialization.
+ */
 class Specialization extends Model
 {
-    protected $fillable = ['track_id', 'name', 'code'];
+    // Fields that can be mass-assigned
+    protected $fillable = [
+        'track_id',  // Which track this specialization belongs to
+        'name',      // e.g. 'Humanities and Social Sciences'
+        'code',      // e.g. 'HUMSS' — always uppercase
+    ];
 
-    // Ang specialization ay belong sa isang track
+    // =============================================
+    // RELATIONSHIPS
+    // =============================================
+
+    /** Specialization belongs to one track */
     public function track()
     {
         return $this->belongsTo(Track::class);
     }
 
-    // Isang specialization ay may maraming subjects
+    /**
+     * Specialization has many subjects
+     * These are elective subjects specific to this specialization
+     */
     public function subjects()
     {
         return $this->hasMany(Subject::class);
     }
 
-    // Isang specialization ay may maraming sections
+    /** Specialization has many sections */
     public function sections()
     {
         return $this->hasMany(Section::class);

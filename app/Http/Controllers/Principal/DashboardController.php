@@ -9,27 +9,37 @@ use App\Models\Grade;
 use App\Models\RiskResult;
 use App\Models\User;
 
+/**
+ * DashboardController (Principal)
+ *
+ * Handles the Principal Dashboard — the main Decision Support System interface.
+ * Shows risk distribution, performance trends, at-risk students,
+ * academic honors, and intervention recommendations.
+ */
 class DashboardController extends Controller
 {
     public function index()
     {
-        // ✅ OPTIMIZED: Lahat ng counts sa isang query each
+        // Summary counts for the top cards
         $totalStudents = Student::count();
         $totalSections = Section::count();
         $totalAdvisers = User::where('role', 'adviser')->count();
 
-        // ✅ OPTIMIZED: Single query para sa latest risk per student
+        // Get the latest risk result per student using MAX(id) grouping
+        // This avoids duplicate counts when students have results for multiple terms
         $latestPerStudent = RiskResult::whereIn('id',
             RiskResult::selectRaw('MAX(id) as id')
                 ->groupBy('student_id')
                 ->pluck('id')
         )->get();
 
+        // Count students per risk level from the latest results
         $lowRisk      = $latestPerStudent->where('risk_level', 'low')->count();
         $moderateRisk = $latestPerStudent->where('risk_level', 'moderate')->count();
         $highRisk     = $latestPerStudent->where('risk_level', 'high')->count();
 
-        // ✅ OPTIMIZED: I-load ang sections with only needed relationships
+        // Load sections with only the relationships needed for charts
+        // Avoids loading unnecessary grade data for dashboard
         $sections = Section::with([
             'students.riskResults',
             'adviser',
@@ -37,7 +47,8 @@ class DashboardController extends Controller
             'specialization',
         ])->get();
 
-        // ✅ OPTIMIZED: Performance trend — single query per term
+        // Performance Trend — average grade per term across all sections
+        // Single query with GROUP BY instead of 3 separate queries
         $termTrends = [];
         $allTermAvgs = Grade::selectRaw('grading_period, AVG(grade) as avg_grade')
             ->groupBy('grading_period')
@@ -49,16 +60,16 @@ class DashboardController extends Controller
                 : null;
         }
 
-        // ✅ OPTIMIZED: At-risk students — single query with eager loading
+        // At-risk students — only moderate and high risk
+        // Used for the at-risk list on the dashboard
         $atRiskStudents = Student::with(['section', 'riskResults'])
             ->whereHas('riskResults', fn($q) =>
                 $q->whereIn('risk_level', ['moderate', 'high'])
             )
             ->get()
             ->map(function ($student) {
-                $latestRisk = $student->riskResults
-                    ->sortByDesc('grading_period')
-                    ->first();
+                // Get the latest risk result for each at-risk student
+                $latestRisk = $student->riskResults->sortByDesc('grading_period')->first();
                 return [
                     'name'       => $student->last_name . ', ' . $student->first_name,
                     'section'    => $student->section->name ?? '—',
@@ -67,13 +78,12 @@ class DashboardController extends Controller
                 ];
             });
 
-        // ✅ OPTIMIZED: Risk per section — gamit ang pre-loaded data
+        // Risk per section — used for the bar chart
+        // Computed from pre-loaded data to avoid extra queries
         $sectionRiskData = $sections->map(function ($section) {
             $low = $moderate = $high = 0;
             foreach ($section->students as $student) {
-                $latest = $student->riskResults
-                    ->sortByDesc('grading_period')
-                    ->first();
+                $latest = $student->riskResults->sortByDesc('grading_period')->first();
                 if ($latest) {
                     match($latest->risk_level) {
                         'low'      => $low++,
@@ -91,14 +101,13 @@ class DashboardController extends Controller
             ];
         });
 
-        // ✅ OPTIMIZED: Honors — single query
+        // Academic Honors — based on latest average_grade from risk_results
+        // DepEd honors thresholds: Highest (98+), High (95-97), With Honors (90-94)
         $allStudentsWithRisk = Student::with(['section', 'riskResults'])
             ->whereHas('riskResults')
             ->get()
             ->map(function ($student) {
-                $latest = $student->riskResults
-                    ->sortByDesc('grading_period')
-                    ->first();
+                $latest = $student->riskResults->sortByDesc('grading_period')->first();
                 return [
                     'name'    => $student->last_name . ', ' . $student->first_name,
                     'section' => $student->section->name ?? '—',
