@@ -11,10 +11,6 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-    // ✅ FIXED: Register routes removed — user creation is handled
-    // exclusively by the Principal via User Management (/principal/users).
-    // Allowing public registration was a security risk since anyone with
-    // the URL could create accounts with no role assigned.
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');

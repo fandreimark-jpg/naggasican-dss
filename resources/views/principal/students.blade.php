@@ -30,10 +30,9 @@
                     class="border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-56">
                 <i class="bi bi-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
             </div>
-            <button type="button" onclick="openAddStudentModal()"
-                class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 whitespace-nowrap">
-                <i class="bi bi-plus-lg"></i> Add Student
-            </button>
+            {{-- "Add Student" button removed — adding new students is now
+                 exclusively done by Advisers on their own Students page.
+                 The Principal can still Edit (correct info) and Delete below. --}}
         </div>
     </div>
 
@@ -122,13 +121,15 @@
     @endif
 </div>
 
-{{-- ADD / EDIT STUDENT MODAL --}}
+{{-- EDIT STUDENT MODAL
+     ("Add" mode was removed — see note above. This modal is now
+     only ever opened via openEditStudentModal() in modal.js.) --}}
 <div id="principalStudentModal"
      class="{{ $errors->any() ? '' : 'hidden' }} fixed inset-0 bg-black/40 flex items-center justify-center z-50">
     <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
 
         <div class="flex justify-between items-center mb-4">
-            <h3 id="studentModalTitle" class="text-lg font-semibold text-gray-800">Add Student</h3>
+            <h3 id="studentModalTitle" class="text-lg font-semibold text-gray-800">Edit Student</h3>
             <button type="button" onclick="closeStudentModal()"
                     class="text-gray-400 hover:text-gray-600">✕</button>
         </div>
@@ -144,10 +145,9 @@
         @endif
 
         <form id="principalStudentForm" method="POST"
-              data-store-url="{{ route('principal.students.store') }}"
               class="space-y-4">
             @csrf
-            <input type="hidden" name="_method" id="studentMethod" value="POST">
+            <input type="hidden" name="_method" id="studentMethod" value="PUT">
 
             <div>
                 <label class="block text-sm text-gray-600 mb-1">LRN (12 digits)</label>
@@ -215,7 +215,7 @@
                         class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
                 <button type="submit" id="studentSubmitBtn"
                         class="bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
-                    Save Student
+                    Update Student
                 </button>
             </div>
         </form>

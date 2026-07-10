@@ -179,6 +179,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // =============================================
     // PRINCIPAL — STUDENT MANAGEMENT MODAL
+    // (Edit-only — adding new students moved to the Adviser side)
     // =============================================
     const principalStudentModal = document.getElementById(
         "principalStudentModal",
@@ -191,17 +192,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const studentSubmitBtn = document.getElementById("studentSubmitBtn");
 
     if (principalStudentModal && principalStudentForm) {
-        const studentStoreUrl = principalStudentForm.dataset.storeUrl;
-
-        window.openAddStudentModal = function () {
-            principalStudentForm.reset();
-            studentModalTitle.textContent = "Add Student";
-            studentSubmitBtn.textContent = "Save Student";
-            principalStudentForm.action = studentStoreUrl;
-            studentMethod.value = "POST";
-            principalStudentModal.classList.remove("hidden");
-        };
-
         window.openEditStudentModal = function (student) {
             principalStudentForm.reset();
             studentModalTitle.textContent = "Edit Student";
@@ -219,7 +209,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 student.birthdate ?? "";
             document.getElementById("ps_section_id").value = student.section_id;
 
-            // I-disable ang LRN field sa edit — hindi na dapat mabago
+            // Disable the LRN field while editing — it should not be changed here
             document.getElementById("ps_lrn").readOnly = true;
             document
                 .getElementById("ps_lrn")
@@ -229,7 +219,7 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         window.closeStudentModal = function () {
-            // I-enable ulit ang LRN field
+            // Re-enable the LRN field for the next time the modal opens
             document.getElementById("ps_lrn").readOnly = false;
             document
                 .getElementById("ps_lrn")

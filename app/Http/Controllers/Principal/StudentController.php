@@ -11,9 +11,10 @@ use Illuminate\Http\Request;
 /**
  * StudentController (Principal)
  *
- * Full CRUD management of student records.
- * Only the Principal can add or remove students.
- * Advisers can only view and edit basic student info.
+ * Principal can view, edit (correct info), and remove student records.
+ * Adding NEW students is now exclusively an Adviser action
+ * (see Adviser\StudentController@store) — matching the paper's design:
+ * "advisers encode student data, principal monitors and reviews."
  */
 class StudentController extends Controller
 {
@@ -36,38 +37,6 @@ class StudentController extends Controller
             ->get();
 
         return view('principal.students', compact('students', 'sections'));
-    }
-
-    /**
-     * Add a new student.
-     * LRN must be unique — 12 digits exactly.
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'lrn'         => 'required|digits:12|unique:students,lrn',
-            'last_name'   => 'required|string|max:255',
-            'first_name'  => 'required|string|max:255',
-            'middle_name' => 'nullable|string|max:255',
-            'gender'      => 'required|in:male,female',
-            'birthdate'   => 'nullable|date',
-            'section_id'  => 'required|exists:sections,id',
-        ]);
-
-        Student::create($request->only([
-            'lrn', 'last_name', 'first_name',
-            'middle_name', 'gender', 'birthdate', 'section_id'
-        ]));
-
-        LogActivity::log(
-            'add_student',
-            'Added student: ' . $request->last_name . ', ' . $request->first_name,
-            'students',
-            null
-        );
-
-        return redirect()->route('principal.students')
-            ->with('success', 'Student added successfully!');
     }
 
     /**

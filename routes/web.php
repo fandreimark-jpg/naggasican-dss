@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
 // Adviser controllers
 use App\Http\Controllers\Adviser\DashboardController as AdviserDashboardController;
 use App\Http\Controllers\Adviser\StudentController as AdviserStudentController;
@@ -37,6 +38,21 @@ Route::get('/dashboard', function () {
 })->middleware('auth')->name('dashboard');
 
 // =============================================
+// PROFILE (self-service — any logged-in user, adviser or principal)
+// -----------------------------------------------
+// This is where the request goes when "Save Changes" or "Update Password"
+// is clicked in the My Profile modal (included on every page — see
+// resources/views/profile/_modal.blade.php). Open to BOTH advisers and
+// principals (only 'auth' middleware — no role check needed), because
+// each user can only ever edit THEIR OWN account. That check happens
+// inside the Controller itself, using auth()->id() to know who is logged in.
+// =============================================
+Route::middleware('auth')->group(function () {
+    Route::put('/profile',              [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password',     [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+});
+
+// =============================================
 // ADVISER ROUTES
 // =============================================
 Route::middleware(['auth', 'role:adviser'])
@@ -45,6 +61,9 @@ Route::middleware(['auth', 'role:adviser'])
     ->group(function () {
         Route::get('/dashboard',          [AdviserDashboardController::class, 'index'])->name('dashboard');
         Route::get('/students',           [AdviserStudentController::class, 'index'])->name('students');
+        // NEW ROUTE: the "Add Student" modal on the adviser students page
+        // submits (POST) here, which runs the store() function in StudentController.
+        Route::post('/students',          [AdviserStudentController::class, 'store'])->name('students.store');
         Route::get('/students/{id}/edit', [AdviserStudentController::class, 'edit'])->name('students.edit');
         Route::put('/students/{id}',      [AdviserStudentController::class, 'update'])->name('students.update');
         Route::get('/grades',             [AdviserGradeController::class, 'index'])->name('grades');
@@ -99,8 +118,10 @@ Route::middleware(['auth', 'role:principal'])
         Route::delete('/sections/{id}', [SectionController::class, 'destroy'])->name('sections.destroy');
 
         // Students Management
+        // NOTE: no POST /students (add) route here anymore — adding students
+        // is now exclusively an Adviser action (see adviser.students.store above),
+        // matching the paper's design: "advisers encode, principal monitors."
         Route::get('/students',         [StudentController::class, 'index'])->name('students');
-        Route::post('/students',        [StudentController::class, 'store'])->name('students.store');
         Route::put('/students/{id}',    [StudentController::class, 'update'])->name('students.update');
         Route::delete('/students/{id}', [StudentController::class, 'destroy'])->name('students.destroy');
 

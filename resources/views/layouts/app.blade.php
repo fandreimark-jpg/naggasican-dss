@@ -75,8 +75,21 @@
             </nav>
 
             <div class="p-4 border-t border-blue-700">
-                <p class="text-sm font-medium">{{ auth()->user()->name }}</p>
-                <p class="text-xs text-blue-300 capitalize">{{ auth()->user()->role }}</p>
+                {{-- Icon button next to the user's name — opens the Profile
+                     modal (defined in resources/views/profile/_modal.blade.php)
+                     instead of navigating to a separate page. Visible to BOTH
+                     advisers and principals; each only ever edits their own account. --}}
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="openProfileModal()"
+                            title="My Profile"
+                            class="text-blue-200 hover:text-white text-lg leading-none">
+                        <i class="bi bi-person-circle"></i>
+                    </button>
+                    <div>
+                        <p class="text-sm font-medium">{{ auth()->user()->name }}</p>
+                        <p class="text-xs text-blue-300 capitalize">{{ auth()->user()->role }}</p>
+                    </div>
+                </div>
                 <form method="POST" action="{{ route('logout') }}" class="mt-3">
                     @csrf
                     <button type="submit" class="w-full text-left text-xs text-blue-300 hover:text-white">
@@ -85,6 +98,10 @@
                 </form>
             </div>
         </aside>
+
+        {{-- Profile modal — included once here so it's available on
+             every authenticated page, not just a dedicated route. --}}
+        @include('profile._modal')
 
         <main class="flex-1 p-6 overflow-y-auto">
             <div class="max-w-6xl mx-auto">
