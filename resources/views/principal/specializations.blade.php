@@ -12,7 +12,7 @@
             <p class="text-xs text-gray-400">{{ $specializations->count() }} total specializations</p>
         </div>
         <button type="button" onclick="openAddModal()"
-            class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 whitespace-nowrap">
+            class="bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-800 whitespace-nowrap">
             <i class="bi bi-plus-lg"></i> Add Specialization
         </button>
     </div>
@@ -39,7 +39,7 @@
                 <td class="px-6 py-3 text-right space-x-2">
                     <button type="button"
                         onclick='openEditModal(@json($spec))'
-                        class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs font-medium border border-blue-200 rounded px-2 py-1 hover:bg-blue-50">
+                        class="inline-flex items-center gap-1 text-brand-600 hover:text-brand-800 text-xs font-medium border border-brand-200 rounded px-2 py-1 hover:bg-brand-50">
                         <i class="bi bi-pencil-square"></i> Edit
                     </button>
                     <form method="POST"
@@ -84,7 +84,7 @@
             <div>
                 <label class="block text-sm text-gray-600 mb-1">Track</label>
                 <select name="track_id" id="specTrack" required
-                        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                     <option value="">— Select Track —</option>
                     @foreach($tracks as $track)
                         <option value="{{ $track->id }}">{{ $track->name }}</option>
@@ -96,21 +96,21 @@
                 <label class="block text-sm text-gray-600 mb-1">Specialization Name</label>
                 <input type="text" name="name" id="specName" required
                        placeholder="e.g. Humanities and Social Sciences"
-                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
             </div>
 
             <div>
                 <label class="block text-sm text-gray-600 mb-1">Code</label>
                 <input type="text" name="code" id="specCode" required
                        placeholder="e.g. HUMSS"
-                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
             </div>
 
             <div class="flex justify-end gap-3 pt-2">
                 <button type="button" onclick="closeModal()"
                         class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
                 <button type="submit"
-                        class="bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
+                        class="bg-brand-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-brand-800">
                     Save Specialization
                 </button>
             </div>

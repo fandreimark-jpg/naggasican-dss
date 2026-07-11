@@ -15,11 +15,11 @@
             <div class="relative">
                 <input type="text" id="sectionSearch"
                     placeholder="Search sections..."
-                    class="border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-56">
+                    class="border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 w-56">
                 <i class="bi bi-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
             </div>
-            <button type="button" onclick="openAddModal()"
-                class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 whitespace-nowrap">
+            <button type="button" onclick="openAddSectionModal()"
+                class="bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-800 whitespace-nowrap">
                 <i class="bi bi-plus-lg"></i> Add Section
             </button>
         </div>
@@ -56,8 +56,8 @@
                 <td class="px-6 py-3 text-gray-600">{{ $section->students->count() }} students</td>
                 <td class="px-6 py-3 text-right space-x-2">
                     <button type="button"
-                        onclick='openEditModal(@json($section->load(["track", "specialization"])))'
-                        class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs font-medium border border-blue-200 rounded px-2 py-1 hover:bg-blue-50">
+                        onclick='openEditSectionModal(@json($section->load(["track", "specialization"])))'
+                        class="inline-flex items-center gap-1 text-brand-600 hover:text-brand-800 text-xs font-medium border border-brand-200 rounded px-2 py-1 hover:bg-brand-50">
                         <i class="bi bi-pencil-square"></i> Edit
                     </button>
                     <form method="POST"
@@ -91,12 +91,12 @@
 </div>
 
 {{-- ADD / EDIT MODAL --}}
-<div id="sectionModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-    <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
+<div id="sectionModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 transition-opacity duration-200 opacity-0">
+    <div class="modal-box bg-white rounded-xl shadow-lg w-full max-w-lg p-6 transition-all duration-200 scale-95 opacity-0">
 
         <div class="flex justify-between items-center mb-4">
             <h3 id="modalTitle" class="text-lg font-semibold text-gray-800">Add Section</h3>
-            <button type="button" onclick="closeModal()"
+            <button type="button" onclick="closeSectionModal()"
                     class="text-gray-400 hover:text-gray-600">✕</button>
         </div>
 
@@ -110,7 +110,9 @@
             </div>
         @endif
 
-        <form id="sectionForm" method="POST" class="space-y-4">
+        <form id="sectionForm" method="POST" class="space-y-4"
+              data-store-url="{{ route('principal.sections.store') }}"
+              data-spec-url="{{ url('principal/specializations-by-track') }}">
             @csrf
             <input type="hidden" name="_method" id="sectionMethod" value="POST">
 
@@ -119,12 +121,12 @@
                     <label class="block text-sm text-gray-600 mb-1">Section Name</label>
                     <input type="text" name="name" id="sectionName" required
                            placeholder="e.g. Narra"
-                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                 </div>
                 <div>
                     <label class="block text-sm text-gray-600 mb-1">Grade Level</label>
                     <select name="grade_level" id="sectionGrade" required
-                            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                         <option value="">— Select Grade —</option>
                         <option value="11">Grade 11</option>
                         <option value="12">Grade 12</option>
@@ -136,7 +138,7 @@
                 <label class="block text-sm text-gray-600 mb-1">Track</label>
                 <select name="track_id" id="sectionTrack" required
                         onchange="loadSpecializations(this.value)"
-                        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                     <option value="">— Select Track —</option>
                     @foreach($tracks as $track)
                         <option value="{{ $track->id }}">{{ $track->name }}</option>
@@ -147,7 +149,7 @@
             <div>
                 <label class="block text-sm text-gray-600 mb-1">Specialization</label>
                 <select name="specialization_id" id="sectionSpec" required
-                        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                     <option value="">— Select Track First —</option>
                 </select>
             </div>
@@ -156,13 +158,13 @@
                 <label class="block text-sm text-gray-600 mb-1">School Year</label>
                 <input type="text" name="school_year" id="sectionSchoolYear" required
                        placeholder="e.g. 2026-2027"
-                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
             </div>
 
             <div>
                 <label class="block text-sm text-gray-600 mb-1">Assign Adviser</label>
                 <select name="adviser_id" id="sectionAdviser"
-                        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                     <option value="">— No Adviser —</option>
                     @foreach($availableAdvisers as $adviser)
                         <option value="{{ $adviser->id }}"
@@ -174,10 +176,10 @@
             </div>
 
             <div class="flex justify-end gap-3 pt-2">
-                <button type="button" onclick="closeModal()"
+                <button type="button" onclick="closeSectionModal()"
                         class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
                 <button type="submit"
-                        class="bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
+                        class="bg-brand-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-brand-800">
                     Save Section
                 </button>
             </div>
@@ -186,11 +188,6 @@
 </div>
 
 @push('scripts')
-<script>
-    const SECTION_STORE_URL = "{{ route('principal.sections.store') }}";
-    const SPEC_BY_TRACK_URL = "{{ url('principal/specializations-by-track') }}";
-</script>
-<script src="{{ asset('js/principal/sections.js') }}"></script>
 <script>
     document.getElementById('sectionSearch').addEventListener('input', function () {
         const query = this.value.toLowerCase();
@@ -205,5 +202,3 @@
     });
 </script>
 @endpush
-
-@endsection

@@ -16,11 +16,11 @@
             <div class="relative">
                 <input type="text" id="userSearch"
                     placeholder="Search users..."
-                    class="border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-64">
+                    class="border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 w-64">
                 <i class="bi bi-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
             </div>
             <button type="button" onclick="openAddModal()"
-                class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 whitespace-nowrap">
+                class="bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-800 whitespace-nowrap">
                 <i class="bi bi-plus-lg"></i> Add User
             </button>
         </div>
@@ -50,7 +50,7 @@
                             <i class="bi bi-shield-lock-fill"></i> Principal
                         </span>
                     @else
-                        <span class="px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold bg-brand-100 text-brand-700">
                             <i class="bi bi-person-fill"></i> Adviser
                         </span>
                     @endif
@@ -58,7 +58,7 @@
                 <td class="px-6 py-3 text-right space-x-2">
                     <button type="button"
                         onclick='openUserEditModal(@json($user))'
-                        class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs font-medium border border-blue-200 rounded px-2 py-1 hover:bg-blue-50">
+                        class="inline-flex items-center gap-1 text-brand-600 hover:text-brand-800 text-xs font-medium border border-brand-200 rounded px-2 py-1 hover:bg-brand-50">
                         <i class="bi bi-pencil-square"></i> Edit
                     </button>
 
@@ -101,7 +101,7 @@
             <a href="{{ $users->previousPageUrl() }}"
                class="px-3 py-1 rounded border hover:bg-gray-50 text-gray-600">← Prev</a>
         @endif
-        <span class="px-3 py-1 rounded border bg-blue-700 text-white font-medium">
+        <span class="px-3 py-1 rounded border bg-brand-700 text-white font-medium">
             {{ $users->currentPage() }}
         </span>
         @if($users->hasMorePages())
@@ -116,8 +116,8 @@
 
 {{-- ADD / EDIT MODAL --}}
 <div id="userModal"
-     class="{{ $errors->any() ? '' : 'hidden' }} fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-    <div id="userModalBox" class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
+     class="{{ $errors->any() ? 'opacity-100' : 'hidden opacity-0' }} fixed inset-0 bg-black/40 flex items-center justify-center z-50 transition-opacity duration-200">
+    <div id="userModalBox" class="modal-box {{ $errors->any() ? 'scale-100 opacity-100' : 'scale-95 opacity-0' }} bg-white rounded-xl shadow-lg w-full max-w-lg p-6 transition-all duration-200">
 
         <div class="flex justify-between items-center mb-4">
             <h3 id="modalTitle" class="text-lg font-semibold text-gray-800">
@@ -145,13 +145,13 @@
                     <label class="block text-sm text-gray-600 mb-1">Last Name</label>
                     <input type="text" name="last_name" id="field_last_name" required
                            value="{{ old('last_name') }}"
-                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                 </div>
                 <div>
                     <label class="block text-sm text-gray-600 mb-1">First Name</label>
                     <input type="text" name="first_name" id="field_first_name" required
                            value="{{ old('first_name') }}"
-                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                 </div>
             </div>
 
@@ -159,12 +159,12 @@
                 <label class="block text-sm text-gray-600 mb-1">Middle Name</label>
                 <input type="text" name="middle_name" id="field_middle_name"
                        value="{{ old('middle_name') }}"
-                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
             </div>
 
             <div>
                 <label class="block text-sm text-gray-600 mb-1">Username</label>
-                <div class="flex items-center border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-400">
+                <div class="flex items-center border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-brand-400">
                     <input type="text" name="username" id="field_username" required
                            value="{{ old('username') }}"
                            placeholder="e.g. juan.delacruz"
@@ -178,7 +178,7 @@
             <div>
                 <label class="block text-sm text-gray-600 mb-1">Role</label>
                 <select name="role" id="field_role" required
-                        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                     <option value="adviser">Adviser</option>
                     <option value="principal">Admin</option>
                 </select>
@@ -189,7 +189,7 @@
                     <span class="text-gray-400 text-xs">(minimum 8 characters)</span>
                 </label>
                 <input type="password" name="password" id="field_password"
-                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
                        placeholder="Enter password">
                 <p id="passwordNote" class="text-xs text-gray-400 mt-1 hidden">
                     Leave blank to keep current password
@@ -200,7 +200,7 @@
                 <button type="button" onclick="closeUserModal()"
                         class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
                 <button type="submit" id="submitBtn"
-                        class="bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
+                        class="bg-brand-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-brand-800">
                     Save User
                 </button>
             </div>

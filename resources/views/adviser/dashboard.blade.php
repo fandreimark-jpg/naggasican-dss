@@ -18,9 +18,9 @@
 
 {{-- Summary Cards --}}
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-    <div class="bg-white rounded-xl p-5 shadow-sm border-t-4 border-blue-500">
+    <div class="bg-white rounded-xl p-5 shadow-sm border-t-4 border-brand-500">
         <p class="text-sm text-gray-500">Total Students</p>
-        <p class="text-3xl font-bold text-blue-700 mt-1">{{ $totalStudents }}</p>
+        <p class="text-3xl font-bold text-brand-700 mt-1">{{ $totalStudents }}</p>
     </div>
     <div class="bg-white rounded-xl p-5 shadow-sm border-t-4 border-green-500">
         <p class="text-sm text-gray-500">Grades Encoded</p>
@@ -50,7 +50,7 @@
         $isSubmitted = $submission !== null;
     @endphp
     <div class="bg-white rounded-xl shadow-sm p-5 border-t-4
-        {{ $isSubmitted ? 'border-green-500' : ($isComplete ? 'border-blue-500' : 'border-gray-200') }}">
+        {{ $isSubmitted ? 'border-green-500' : ($isComplete ? 'border-brand-500' : 'border-gray-200') }}">
         <div class="flex justify-between items-start mb-2">
             <p class="text-sm font-semibold text-gray-700">Term {{ $term }}</p>
             @if($isSubmitted)
@@ -58,7 +58,7 @@
                     Submitted
                 </span>
             @elseif($isComplete)
-                <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 font-medium">
+                <span class="text-xs px-2 py-1 rounded-full bg-brand-100 text-brand-700 font-medium">
                     Ready
                 </span>
             @else
@@ -76,7 +76,7 @@
             </p>
         @elseif($isComplete)
             <a href="{{ route('adviser.submit.report') }}"
-               class="block w-full mt-3 text-center bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-800">
+               class="block w-full mt-3 text-center bg-brand-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-brand-800">
                 Submit Now →
             </a>
         @else
@@ -97,7 +97,7 @@
             <p class="text-sm text-gray-500">Risk level overview</p>
         </div>
         <a href="{{ route('adviser.students') }}"
-           class="text-sm text-blue-600 hover:underline">
+           class="text-sm text-brand-600 hover:underline">
             View all →
         </a>
     </div>

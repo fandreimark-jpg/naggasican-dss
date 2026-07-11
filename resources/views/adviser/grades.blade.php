@@ -26,7 +26,7 @@
             <a href="{{ route('adviser.grades') }}?period={{ $t }}"
                 class="px-4 py-1.5 rounded-full text-sm font-medium border transition
                     {{ $selectedPeriod == $t
-                        ? 'bg-blue-700 text-white border-blue-700'
+                        ? 'bg-brand-700 text-white border-brand-700'
                         : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50' }}">
                 Term {{ $t }}
             </a>
@@ -82,7 +82,7 @@
                                 value="{{ $existing ? number_format($existing->grade, 2, '.', '') : '' }}"
                                 min="60" max="100" step="0.01"
                                 class="w-20 border rounded-lg px-2 py-1.5 text-center text-sm
-                                       focus:outline-none focus:ring-2 focus:ring-blue-400
+                                       focus:outline-none focus:ring-2 focus:ring-brand-400
                                        {{ $isFailing
                                             ? 'border-red-300 bg-red-50 text-red-600'
                                             : 'border-gray-200 hover:border-gray-300' }}"
@@ -106,7 +106,7 @@
         {{-- Save Button --}}
         <div class="px-6 py-4 border-t flex justify-end">
             <button type="submit"
-                class="bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
+                class="bg-brand-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-brand-800">
                 <i class="bi bi-floppy"></i> Save All Grades
             </button>
         </div>

@@ -5,14 +5,7 @@
 
 @section('content')
 
-{{-- Info notice --}}
-<div class="bg-blue-50 border border-blue-200 text-blue-700 text-sm px-4 py-3 rounded-lg mb-4">
-    You can add and edit students in your section. Contact the principal to remove a student.
-</div>
 
-{{-- NEW BUTTON: "Add Student" — opens the modal below
-     (id="adviserAddStudentModal") when clicked. The form in that
-     modal submits (POST) to the adviser.students.store route. --}}
 <div class="bg-white rounded-xl shadow-sm overflow-x-auto">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 px-6 py-4 border-b">
         <div>
@@ -20,19 +13,16 @@
             <p class="text-xs text-gray-400">{{ $students->count() }} student(s) in your section</p>
         </div>
         <div class="flex items-center gap-3 flex-wrap">
-            {{-- Search box: filters the table rows below as you type.
-                 This runs entirely in the browser (JavaScript) — no page
-                 reload, no server request. See filterAdviserStudents()
-                 in the script block at the bottom of this file. --}}
+            {{-- Search box--}}
             <div class="relative">
                 <input type="text" id="adviserStudentSearch"
                     oninput="filterAdviserStudents()"
                     placeholder="Search students..."
-                    class="border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-56">
+                    class="border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 w-56">
                 <i class="bi bi-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
             </div>
             <button type="button" onclick="openAdviserAddStudent()"
-                class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 whitespace-nowrap">
+                class="bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-800 whitespace-nowrap">
                 <i class="bi bi-plus-lg"></i> Add Student
             </button>
         </div>
@@ -48,13 +38,10 @@
                 <th class="px-6 py-3 text-right">Actions</th>
             </tr>
         </thead>
-        {{-- id="adviserStudentTableBody" lets our search JS find this
-             table's rows specifically, without accidentally touching
-             any other table on the page. --}}
+
         <tbody id="adviserStudentTableBody" class="divide-y divide-gray-100">
             @forelse($students as $student)
-            {{-- class="student-row": the search JS reads each row's
-                 visible text and hides the ones that don't match. --}}
+
             <tr class="student-row hover:bg-gray-50">
                 <td class="px-6 py-3 text-gray-600">{{ $student->lrn }}</td>
                 <td class="px-6 py-3 font-medium text-gray-800">{{ $student->last_name }}</td>
@@ -64,7 +51,7 @@
                 <td class="px-6 py-3 text-right">
                     <button type="button"
                         onclick='openEditModal(@json($student))'
-                        class="text-blue-600 hover:underline text-sm"><i class="bi bi-pencil-square"></i>Edit</button>
+                        class="text-brand-600 hover:underline text-sm"><i class="bi bi-pencil-square"></i>Edit</button>
                 </td>
             </tr>
             @empty
@@ -131,7 +118,7 @@
                 <button type="button" onclick="closeEditModal()"
                         class="px-4 py-2 text-sm text-gray-500">Cancel</button>
                 <button type="submit"
-                        class="bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium">
+                        class="bg-brand-700 text-white px-6 py-2 rounded-lg text-sm font-medium">
                     Update Student
                 </button>
             </div>
@@ -139,10 +126,7 @@
     </div>
 </div>
 
-{{-- ADD STUDENT MODAL
-     This is a simple popup form. When submitted, it goes straight
-     to Adviser\StudentController@store — no JavaScript AJAX,
-     just a normal form submit (simpler, fewer things that can break). --}}
+{{-- ADD STUDENT MODAL --}}
 <div id="adviserAddStudentModal"
      class="{{ $errors->any() ? '' : 'hidden' }} fixed inset-0 bg-black/40 flex items-center justify-center z-50">
     <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
@@ -170,7 +154,7 @@
                 <label class="block text-sm text-gray-600 mb-1">LRN (12 digits)</label>
                 <input type="text" name="lrn" maxlength="12" required
                        value="{{ old('lrn') }}"
-                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
             </div>
 
             <div class="grid grid-cols-2 gap-4">
@@ -178,13 +162,13 @@
                     <label class="block text-sm text-gray-600 mb-1">Last Name</label>
                     <input type="text" name="last_name" required
                            value="{{ old('last_name') }}"
-                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                 </div>
                 <div>
                     <label class="block text-sm text-gray-600 mb-1">First Name</label>
                     <input type="text" name="first_name" required
                            value="{{ old('first_name') }}"
-                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                 </div>
             </div>
 
@@ -192,14 +176,14 @@
                 <label class="block text-sm text-gray-600 mb-1">Middle Name</label>
                 <input type="text" name="middle_name"
                        value="{{ old('middle_name') }}"
-                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm text-gray-600 mb-1">Gender</label>
                     <select name="gender" required
-                            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                         <option value="">Select</option>
                         <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
                         <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
@@ -209,7 +193,7 @@
                     <label class="block text-sm text-gray-600 mb-1">Birthdate</label>
                     <input type="date" name="birthdate"
                            value="{{ old('birthdate') }}"
-                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                 </div>
             </div>
 
@@ -222,7 +206,7 @@
                 <button type="button" onclick="closeAdviserAddStudent()"
                         class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
                 <button type="submit"
-                        class="bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
+                        class="bg-brand-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-brand-800">
                     Save Student
                 </button>
             </div>
@@ -232,31 +216,8 @@
 
 @push('scripts')
 <script>
-    // These are the 3 simple functions that control the Add Student modal.
-    // We only toggle the "hidden" class — a Tailwind class that hides
-    // an element (display: none). None of this sends a request to the
-    // server; it's purely showing/hiding the popup on the page.
-
-    // Runs when the "+ Add Student" button is clicked
-    function openAdviserAddStudent() {
-        document.getElementById('adviserAddStudentModal').classList.remove('hidden');
-    }
-    // Runs when the "✕" or "Cancel" button is clicked
-    function closeAdviserAddStudent() {
-        document.getElementById('adviserAddStudentModal').classList.add('hidden');
-    }
-    // Runs when clicking OUTSIDE the modal box (the dark background overlay)
-    document.getElementById('adviserAddStudentModal').addEventListener('click', function (e) {
-        if (e.target === this) closeAdviserAddStudent();
-    });
-
     // SEARCH FILTER
-    // -------------
-    // Runs every time the user types in the search box. It doesn't talk
-    // to the server at all — it just loops through the rows already on
-    // the page and hides the ones whose text doesn't contain the search
-    // term (case-insensitive). Works instantly since this section usually
-    // only has a small number of students.
+
     function filterAdviserStudents() {
         const query = document.getElementById('adviserStudentSearch').value.toLowerCase();
         const rows  = document.querySelectorAll('#adviserStudentTableBody .student-row');

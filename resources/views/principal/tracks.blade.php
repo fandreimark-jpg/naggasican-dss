@@ -12,7 +12,7 @@
             <p class="text-xs text-gray-400">{{ $tracks->count() }} total tracks</p>
         </div>
         <button type="button" onclick="openAddModal()"
-            class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 whitespace-nowrap">
+            class="bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-800 whitespace-nowrap">
             <i class="bi bi-plus-lg"></i> Add Track
         </button>
     </div>
@@ -31,7 +31,7 @@
             <tr class="hover:bg-gray-50">
                 <td class="px-6 py-3 font-medium text-gray-800">{{ $track->name }}</td>
                 <td class="px-6 py-3">
-                    <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-1 rounded">
+                    <span class="bg-brand-100 text-brand-700 text-xs font-semibold px-2 py-1 rounded">
                         {{ $track->code }}
                     </span>
                 </td>
@@ -45,7 +45,7 @@
                 <td class="px-6 py-3 text-right space-x-2">
                     <button type="button"
                         onclick='openEditModal(@json($track))'
-                        class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs font-medium border border-blue-200 rounded px-2 py-1 hover:bg-blue-50">
+                        class="inline-flex items-center gap-1 text-brand-600 hover:text-brand-800 text-xs font-medium border border-brand-200 rounded px-2 py-1 hover:bg-brand-50">
                         <i class="bi bi-pencil-square"></i> Edit
                     </button>
                     <form method="POST"
@@ -91,14 +91,14 @@
                 <label class="block text-sm text-gray-600 mb-1">Track Name</label>
                 <input type="text" name="name" id="trackName" required
                        placeholder="e.g. Academic Track"
-                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
             </div>
 
             <div>
                 <label class="block text-sm text-gray-600 mb-1">Code</label>
                 <input type="text" name="code" id="trackCode" required
                        placeholder="e.g. ACAD"
-                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                 <p class="text-xs text-gray-400 mt-1">Short code for the track (auto-uppercased)</p>
             </div>
 
@@ -106,7 +106,7 @@
                 <button type="button" onclick="closeModal()"
                         class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
                 <button type="submit"
-                        class="bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
+                        class="bg-brand-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-brand-800">
                     Save Track
                 </button>
             </div>

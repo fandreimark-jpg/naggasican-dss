@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Activity Logs')
 @section('subtitle', 'System activity history')
 
@@ -25,7 +24,7 @@
             @forelse($logs as $log)
             @php
                 $actionColors = [
-                    'login'         => 'bg-blue-100 text-blue-700',
+                    'login'         => 'bg-brand-100 text-brand-700',
                     'logout'        => 'bg-gray-100 text-gray-600',
                     'encode_grades' => 'bg-green-100 text-green-700',
                     'submit_report' => 'bg-purple-100 text-purple-700',
@@ -75,7 +74,7 @@
                 <a href="{{ $logs->previousPageUrl() }}"
                    class="px-3 py-1 rounded border hover:bg-gray-50 text-gray-600">← Prev</a>
             @endif
-            <span class="px-3 py-1 rounded border bg-blue-700 text-white font-medium">
+            <span class="px-3 py-1 rounded border bg-brand-700 text-white font-medium">
                 {{ $logs->currentPage() }}
             </span>
             @if($logs->hasMorePages())

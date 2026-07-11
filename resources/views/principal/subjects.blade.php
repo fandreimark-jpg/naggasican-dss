@@ -14,20 +14,20 @@
         <div class="flex items-center gap-3 flex-wrap">
             <div class="flex gap-2">
                 <a href="{{ route('principal.subjects') }}"
-                   class="text-xs px-3 py-1.5 rounded-full {{ !request('type') ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">All</a>
+                   class="text-xs px-3 py-1.5 rounded-full {{ !request('type') ? 'bg-brand-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">All</a>
                 <a href="{{ route('principal.subjects', ['type' => 'core']) }}"
-                   class="text-xs px-3 py-1.5 rounded-full {{ request('type') === 'core' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">Core</a>
+                   class="text-xs px-3 py-1.5 rounded-full {{ request('type') === 'core' ? 'bg-brand-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">Core</a>
                 <a href="{{ route('principal.subjects', ['type' => 'elective']) }}"
-                   class="text-xs px-3 py-1.5 rounded-full {{ request('type') === 'elective' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">Elective</a>
+                   class="text-xs px-3 py-1.5 rounded-full {{ request('type') === 'elective' ? 'bg-brand-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">Elective</a>
             </div>
             <div class="relative">
                 <input type="text" id="subjectSearch"
                     placeholder="Search subjects..."
-                    class="border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-56">
+                    class="border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 w-56">
                 <i class="bi bi-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
             </div>
             <button type="button" onclick="openAddModal()"
-                class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 whitespace-nowrap">
+                class="bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-800 whitespace-nowrap">
                 <i class="bi bi-plus-lg"></i> Add Subject
             </button>
         </div>
@@ -61,7 +61,7 @@
                 <td class="px-6 py-3 text-right space-x-2">
                     <button type="button"
                         onclick='openEditModal(@json($subject))'
-                        class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs font-medium border border-blue-200 rounded px-2 py-1 hover:bg-blue-50">
+                        class="inline-flex items-center gap-1 text-brand-600 hover:text-brand-800 text-xs font-medium border border-brand-200 rounded px-2 py-1 hover:bg-brand-50">
                         <i class="bi bi-pencil-square"></i> Edit
                     </button>
                     <form method="POST"
@@ -112,14 +112,14 @@
                 <label class="block text-sm text-gray-600 mb-1">Subject Name</label>
                 <input type="text" name="name" id="subjectName" required
                        placeholder="e.g. Effective Communication"
-                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm text-gray-600 mb-1">Type</label>
                     <select name="type" id="subjectType" required onchange="toggleTrackFields()"
-                            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                         <option value="">— Select Type —</option>
                         <option value="core">Core</option>
                         <option value="elective">Elective</option>
@@ -128,7 +128,7 @@
                 <div>
                     <label class="block text-sm text-gray-600 mb-1">Grade Level</label>
                     <select name="grade_level" id="subjectGrade" required
-                            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                         <option value="">— Select Grade —</option>
                         <option value="11">Grade 11</option>
                         <option value="12">Grade 12</option>
@@ -141,7 +141,7 @@
                     <label class="block text-sm text-gray-600 mb-1">Track</label>
                     <select name="track_id" id="subjectTrack"
                             onchange="loadSpecializations(this.value)"
-                            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                         <option value="">— Select Track —</option>
                         @foreach($tracks as $track)
                             <option value="{{ $track->id }}">{{ $track->name }}</option>
@@ -154,7 +154,7 @@
                         <span class="text-gray-400 text-xs">(optional)</span>
                     </label>
                     <select name="specialization_id" id="subjectSpec"
-                            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                         <option value="">— All specializations in track —</option>
                     </select>
                 </div>
@@ -164,7 +164,7 @@
                 <button type="button" onclick="closeModal()"
                         class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
                 <button type="submit"
-                        class="bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
+                        class="bg-brand-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-brand-800">
                     Save Subject
                 </button>
             </div>

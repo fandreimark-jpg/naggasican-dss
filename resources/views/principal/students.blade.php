@@ -14,7 +14,7 @@
         <div class="flex items-center gap-3 flex-wrap">
             <form method="GET">
                 <select name="section_id" onchange="this.form.submit()"
-                    class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                     <option value="">All Sections</option>
                     @foreach($sections as $section)
                         <option value="{{ $section->id }}"
@@ -27,7 +27,7 @@
             <div class="relative">
                 <input type="text" id="studentSearch"
                     placeholder="Search students..."
-                    class="border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-56">
+                    class="border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 w-56">
                 <i class="bi bi-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
             </div>
             {{-- "Add Student" button removed — adding new students is now
@@ -65,7 +65,7 @@
                 <td class="px-6 py-3 text-right space-x-2">
                     <button type="button"
                         onclick='openEditStudentModal(@json($student))'
-                        class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs font-medium border border-blue-200 rounded px-2 py-1 hover:bg-blue-50">
+                        class="inline-flex items-center gap-1 text-brand-600 hover:text-brand-800 text-xs font-medium border border-brand-200 rounded px-2 py-1 hover:bg-brand-50">
                         <i class="bi bi-pencil-square"></i> Edit
                     </button>
                     <form method="POST"
@@ -106,7 +106,7 @@
                 <a href="{{ $students->previousPageUrl() }}"
                    class="px-3 py-1 rounded border hover:bg-gray-50 text-gray-600">← Prev</a>
             @endif
-            <span class="px-3 py-1 rounded border bg-blue-700 text-white font-medium">
+            <span class="px-3 py-1 rounded border bg-brand-700 text-white font-medium">
                 {{ $students->currentPage() }}
             </span>
             @if($students->hasMorePages())
@@ -125,8 +125,8 @@
      ("Add" mode was removed — see note above. This modal is now
      only ever opened via openEditStudentModal() in modal.js.) --}}
 <div id="principalStudentModal"
-     class="{{ $errors->any() ? '' : 'hidden' }} fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-    <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
+     class="{{ $errors->any() ? 'opacity-100' : 'hidden opacity-0' }} fixed inset-0 bg-black/40 flex items-center justify-center z-50 transition-opacity duration-200">
+    <div class="modal-box {{ $errors->any() ? 'scale-100 opacity-100' : 'scale-95 opacity-0' }} bg-white rounded-xl shadow-lg w-full max-w-lg p-6 transition-all duration-200">
 
         <div class="flex justify-between items-center mb-4">
             <h3 id="studentModalTitle" class="text-lg font-semibold text-gray-800">Edit Student</h3>
@@ -153,7 +153,7 @@
                 <label class="block text-sm text-gray-600 mb-1">LRN (12 digits)</label>
                 <input type="text" name="lrn" id="ps_lrn" maxlength="12" required
                        value="{{ old('lrn') }}"
-                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
             </div>
 
             <div class="grid grid-cols-2 gap-4">
@@ -161,13 +161,13 @@
                     <label class="block text-sm text-gray-600 mb-1">Last Name</label>
                     <input type="text" name="last_name" id="ps_last_name" required
                            value="{{ old('last_name') }}"
-                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                 </div>
                 <div>
                     <label class="block text-sm text-gray-600 mb-1">First Name</label>
                     <input type="text" name="first_name" id="ps_first_name" required
                            value="{{ old('first_name') }}"
-                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                 </div>
             </div>
 
@@ -175,14 +175,14 @@
                 <label class="block text-sm text-gray-600 mb-1">Middle Name</label>
                 <input type="text" name="middle_name" id="ps_middle_name"
                        value="{{ old('middle_name') }}"
-                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                       class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm text-gray-600 mb-1">Gender</label>
                     <select name="gender" id="ps_gender" required
-                            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                         <option value="">Select</option>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
@@ -192,14 +192,14 @@
                     <label class="block text-sm text-gray-600 mb-1">Birthdate</label>
                     <input type="date" name="birthdate" id="ps_birthdate"
                            value="{{ old('birthdate') }}"
-                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                 </div>
             </div>
 
             <div>
                 <label class="block text-sm text-gray-600 mb-1">Section</label>
                 <select name="section_id" id="ps_section_id" required
-                        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                     <option value="">Select Section</option>
                     @foreach($sections as $section)
                         <option value="{{ $section->id }}">
@@ -214,7 +214,7 @@
                 <button type="button" onclick="closeStudentModal()"
                         class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
                 <button type="submit" id="studentSubmitBtn"
-                        class="bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
+                        class="bg-brand-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-brand-800">
                     Update Student
                 </button>
             </div>

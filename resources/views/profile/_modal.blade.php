@@ -13,8 +13,8 @@
     the user can see what went wrong — see the class="{{ $errors->any() ... }}" line below.
 --}}
 <div id="profileModal"
-     class="{{ $errors->any() ? '' : 'hidden' }} fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-    <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+     class="{{ $errors->any() ? 'opacity-100' : 'hidden opacity-0' }} fixed inset-0 bg-black/40 flex items-center justify-center z-50 transition-opacity duration-200">
+    <div class="modal-box {{ $errors->any() ? 'scale-100 opacity-100' : 'scale-95 opacity-0' }} bg-white rounded-xl shadow-lg w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto transition-all duration-200">
 
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-semibold text-gray-800">My Profile</h3>
@@ -36,13 +36,13 @@
                         <label class="block text-sm text-gray-600 mb-1">Last Name</label>
                         <input type="text" name="last_name" required
                                value="{{ old('last_name', auth()->user()->last_name) }}"
-                               class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                               class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                     </div>
                     <div>
                         <label class="block text-sm text-gray-600 mb-1">First Name</label>
                         <input type="text" name="first_name" required
                                value="{{ old('first_name', auth()->user()->first_name) }}"
-                               class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                               class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                     </div>
                 </div>
 
@@ -50,7 +50,7 @@
                     <label class="block text-sm text-gray-600 mb-1">Middle Name</label>
                     <input type="text" name="middle_name"
                            value="{{ old('middle_name', auth()->user()->middle_name) }}"
-                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                 </div>
 
                 <div>
@@ -63,7 +63,7 @@
                            data-original-email="{{ auth()->user()->email }}"
                            value="{{ old('email', auth()->user()->email) }}"
                            oninput="toggleCurrentPasswordField()"
-                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                 </div>
 
                 {{-- This field starts HIDDEN. It only appears (via JavaScript)
@@ -72,7 +72,7 @@
                 <div id="currentPasswordWrapper" class="hidden">
                     <label class="block text-sm text-gray-600 mb-1">Current Password</label>
                     <input type="password" name="current_password" id="current_password_field"
-                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                     <p class="text-xs text-gray-400 mt-1">Required to confirm changes to your login email.</p>
                 </div>
 
@@ -88,7 +88,7 @@
 
                 <div class="pt-1">
                     <button type="submit"
-                            class="bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
+                            class="bg-brand-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-brand-800">
                         Save Changes
                     </button>
                 </div>
@@ -109,19 +109,19 @@
                 <div>
                     <label class="block text-sm text-gray-600 mb-1">Current Password</label>
                     <input type="password" name="current_password" required
-                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                           class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-sm text-gray-600 mb-1">New Password</label>
                         <input type="password" name="password" required minlength="8"
-                               class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                               class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                     </div>
                     <div>
                         <label class="block text-sm text-gray-600 mb-1">Confirm New Password</label>
                         <input type="password" name="password_confirmation" required minlength="8"
-                               class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                               class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                     </div>
                 </div>
 
@@ -137,7 +137,7 @@
 
                 <div class="pt-1">
                     <button type="submit"
-                            class="bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
+                            class="bg-brand-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-brand-800">
                         Update Password
                     </button>
                 </div>
@@ -146,50 +146,5 @@
 
     </div>
 </div>
-
-@push('scripts')
-<script>
-    // Same simple show/hide pattern used by the Add Student modal.
-    function openProfileModal() {
-        document.getElementById('profileModal').classList.remove('hidden');
-    }
-    function closeProfileModal() {
-        document.getElementById('profileModal').classList.add('hidden');
-    }
-    // Clicking the dark overlay outside the modal box closes it
-    document.getElementById('profileModal').addEventListener('click', function (e) {
-        if (e.target === this) closeProfileModal();
-    });
-
-    // Shows/hides the "Current Password" field on the Profile Information
-    // form, depending on whether the email was actually changed.
-    //
-    // How it decides: it reads the email input's CURRENT typed value,
-    // and compares it against data-original-email (the email as saved
-    // in the database, set when the page rendered). If they're different,
-    // the user is changing their email, so we show the field and mark it
-    // required. If they match, we hide it and clear/un-require it.
-    function toggleCurrentPasswordField() {
-        const emailInput = document.getElementById('profile_email');
-        const wrapper     = document.getElementById('currentPasswordWrapper');
-        const pwField     = document.getElementById('current_password_field');
-
-        const emailWasChanged = emailInput.value !== emailInput.dataset.originalEmail;
-
-        if (emailWasChanged) {
-            wrapper.classList.remove('hidden');
-            pwField.required = true;
-        } else {
-            wrapper.classList.add('hidden');
-            pwField.required = false;
-            pwField.value = ''; // clear it so nothing gets submitted by accident
-        }
-    }
-
-    // Run this once as soon as the page loads. This matters when the
-    // form re-renders after a validation error — for example, if the
-    // user already typed a new email but forgot the current password,
-    // the field needs to show up again automatically (not stay hidden).
-    document.addEventListener('DOMContentLoaded', toggleCurrentPasswordField);
-</script>
-@endpush
+{{-- Modal open/close and the current-password toggle logic now live in
+     resources/js/modal.js, alongside every other modal in the system. --}}
