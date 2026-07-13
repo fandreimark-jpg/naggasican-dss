@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Subject;
 use App\Models\Track;
 use App\Models\Specialization;
+use App\Helpers\LogActivity;
 use Illuminate\Http\Request;
 
 /**
@@ -59,6 +60,13 @@ class SubjectController extends Controller
             'track_id'          => $request->type === 'elective' ? $request->track_id : null,
             'specialization_id' => $request->type === 'elective' ? $request->specialization_id : null,
         ]);
+
+        LogActivity::log(
+            'create_subject',
+            'Created ' . $request->role . ' subjects: ' . $request->name,
+            'subjects',
+            null
+        );
 
         return redirect()->route('principal.subjects')
             ->with('success', 'Subject added successfully!');

@@ -64,7 +64,6 @@ Route::middleware(['auth', 'role:adviser'])
         // NEW ROUTE: the "Add Student" modal on the adviser students page
         // submits (POST) here, which runs the store() function in StudentController.
         Route::post('/students',          [AdviserStudentController::class, 'store'])->name('students.store');
-        Route::get('/students/{id}/edit', [AdviserStudentController::class, 'edit'])->name('students.edit');
         Route::put('/students/{id}',      [AdviserStudentController::class, 'update'])->name('students.update');
         Route::get('/grades',             [AdviserGradeController::class, 'index'])->name('grades');
         Route::post('/grades',            [AdviserGradeController::class, 'store'])->name('grades.store');

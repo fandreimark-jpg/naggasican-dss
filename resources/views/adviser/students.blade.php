@@ -16,7 +16,6 @@
             {{-- Search box--}}
             <div class="relative">
                 <input type="text" id="adviserStudentSearch"
-                    oninput="filterAdviserStudents()"
                     placeholder="Search students..."
                     class="border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 w-56">
                 <i class="bi bi-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
@@ -34,6 +33,7 @@
                 <th class="text-left px-6 py-3">Last Name</th>
                 <th class="text-left px-6 py-3">First Name</th>
                 <th class="text-left px-6 py-3">Middle Name</th>
+                <th class="text-left px-6 py-3">Birthdate</th>
                 <th class="text-left px-6 py-3">Gender</th>
                 <th class="px-6 py-3 text-right">Actions</th>
             </tr>
@@ -47,6 +47,7 @@
                 <td class="px-6 py-3 font-medium text-gray-800">{{ $student->last_name }}</td>
                 <td class="px-6 py-3 text-gray-800">{{ $student->first_name }}</td>
                 <td class="px-6 py-3 text-gray-800">{{ $student->middle_name ?? '—' }}</td>
+                <td class="px-6 py-3 capitalize text-gray-600">{{ $student->formatted_birthdate }}</td>
                 <td class="px-6 py-3 capitalize text-gray-600">{{ $student->gender }}</td>
                 <td class="px-6 py-3 text-right">
                     <button type="button"
@@ -67,8 +68,8 @@
 
 {{-- EDIT MODAL ONLY --}}
 <div id="editModal"
-     class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-    <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
+     class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 transition-opacity duration-200 opacity-0">
+    <div class="modal-box bg-white rounded-xl shadow-lg w-full max-w-lg p-6 transition-all duration-200 scale-95 opacity-0">
 
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-semibold text-gray-800">Edit Student</h3>
@@ -128,8 +129,8 @@
 
 {{-- ADD STUDENT MODAL --}}
 <div id="adviserAddStudentModal"
-     class="{{ $errors->any() ? '' : 'hidden' }} fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-    <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
+     class="{{ $errors->any() ? 'opacity-100' : 'hidden opacity-0' }} fixed inset-0 bg-black/40 flex items-center justify-center z-50 transition-opacity duration-200">
+    <div class="modal-box {{ $errors->any() ? 'scale-100 opacity-100' : 'scale-95 opacity-0' }} bg-white rounded-xl shadow-lg w-full max-w-lg p-6 transition-all duration-200">
 
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-semibold text-gray-800">Add Student</h3>
@@ -216,17 +217,9 @@
 
 @push('scripts')
 <script>
-    // SEARCH FILTER
-
-    function filterAdviserStudents() {
-        const query = document.getElementById('adviserStudentSearch').value.toLowerCase();
-        const rows  = document.querySelectorAll('#adviserStudentTableBody .student-row');
-
-        rows.forEach(function (row) {
-            const rowText = row.textContent.toLowerCase();
-            row.style.display = rowText.includes(query) ? '' : 'none';
-        });
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+        initTableSearch('adviserStudentSearch', '#adviserStudentTableBody .student-row');
+    });
 </script>
 @endpush
 

@@ -92,28 +92,19 @@ class StudentController extends Controller
     }
 
     /**
-     * Show edit form for a specific student.
-     * Verifies the student belongs to the adviser's section before showing.
-     */
-    public function edit($id)
-    {
-        $section = Section::where('adviser_id', auth()->id())->first();
-
-        // Security check — ensure student belongs to adviser's section
-        $student = Student::where('id', $id)
-            ->where('section_id', $section->id)
-            ->firstOrFail();
-
-        return view('adviser.students-edit', compact('student', 'section'));
-    }
-
-    /**
      * Update a student's basic information.
      * Advisers can only update personal info — not LRN or section.
      */
     public function update(Request $request, $id)
     {
         $section = Section::where('adviser_id', auth()->id())->first();
+
+        // BUG FIX: without this check, an adviser with no assigned section
+        // would crash here trying to read ->id from null.
+        if (!$section) {
+            return redirect()->route('adviser.students')
+                ->with('error', 'No section assigned to you yet. Contact the principal.');
+        }
 
         // Security check — ensure student belongs to adviser's section
         $student = Student::where('id', $id)

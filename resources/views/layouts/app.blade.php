@@ -159,33 +159,13 @@
     <style>
         @keyframes toastShrink { from { width: 100%; } to { width: 0%; } }
     </style>
-    <script>
-        (function () {
-            const toast = document.getElementById('flashToast');
-            if (!toast) return;
-            requestAnimationFrame(() => {
-                setTimeout(() => {
-                    toast.classList.remove('opacity-0', 'translate-y-3');
-                    toast.classList.add('opacity-100', 'translate-y-0');
-                }, 80);
-            });
-            let autoDismiss = setTimeout(dismissToast, 4000);
-            toast.addEventListener('mouseenter', () => clearTimeout(autoDismiss));
-            toast.addEventListener('mouseleave', () => { autoDismiss = setTimeout(dismissToast, 1500); });
-        })();
-        function dismissToast() {
-            const toast = document.getElementById('flashToast');
-            if (!toast) return;
-            toast.classList.add('opacity-0', 'translate-y-3');
-            setTimeout(() => toast.remove(), 500);
-        }
-    </script>
+    {{-- Toast auto-dismiss logic now lives in resources/js/confirm.js --}}
     @endif
     {{-- ============================================================= --}}
 
     {{-- ===================== CONFIRM DELETE MODAL ================== --}}
-    <div id="confirmDeleteModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[9998]">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden transform transition-all duration-200 scale-95 opacity-0" id="confirmDeleteBox">
+    <div id="confirmDeleteModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[9998] transition-opacity duration-200 opacity-0">
+        <div class="modal-box bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden transform transition-all duration-200 scale-95 opacity-0" id="confirmDeleteBox">
             <div class="h-1.5 bg-red-500 w-full"></div>
             <div class="p-6">
                 <div class="flex items-center gap-3 mb-3">
@@ -214,8 +194,8 @@
     {{-- ============================================================= --}}
 
     {{-- ===================== CONFIRM RESUBMIT MODAL ================ --}}
-    <div id="confirmResubmitModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[9998]">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden transform transition-all duration-200 scale-95 opacity-0" id="confirmResubmitBox">
+    <div id="confirmResubmitModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[9998] transition-opacity duration-200 opacity-0">
+        <div class="modal-box bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden transform transition-all duration-200 scale-95 opacity-0" id="confirmResubmitBox">
             <div class="h-1.5 bg-yellow-400 w-full"></div>
             <div class="p-6">
                 <div class="flex items-center gap-3 mb-3">
@@ -243,104 +223,9 @@
     </div>
     {{-- ============================================================= --}}
 
-    <script>
-        let _pendingDeleteForm    = null;
-        let _pendingResubmitForm  = null;
-
-        // ===== DELETE CONFIRM =====
-        document.addEventListener('submit', function (e) {
-            const form = e.target;
-
-            // Delete confirm
-            if (form.dataset.confirm) {
-                e.preventDefault();
-                showConfirmDelete(form, form.dataset.confirm);
-                return;
-            }
-
-            // Resubmit confirm
-            if (form.dataset.resubmit) {
-                e.preventDefault();
-                showConfirmResubmit(form, form.dataset.resubmit);
-                return;
-            }
-        });
-
-        function showConfirmDelete(form, message) {
-            _pendingDeleteForm = form;
-            document.getElementById('confirmDeleteMessage').textContent = message;
-            const modal = document.getElementById('confirmDeleteModal');
-            const box   = document.getElementById('confirmDeleteBox');
-            modal.classList.remove('hidden');
-            requestAnimationFrame(() => setTimeout(() => {
-                box.classList.remove('scale-95', 'opacity-0');
-                box.classList.add('scale-100', 'opacity-100');
-            }, 20));
-        }
-
-        function closeConfirmDelete() {
-            const modal = document.getElementById('confirmDeleteModal');
-            const box   = document.getElementById('confirmDeleteBox');
-            box.classList.remove('scale-100', 'opacity-100');
-            box.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => { modal.classList.add('hidden'); _pendingDeleteForm = null; }, 200);
-        }
-
-        function proceedDelete() {
-            if (_pendingDeleteForm) {
-                const btn = document.getElementById('confirmDeleteBtn');
-                btn.disabled  = true;
-                btn.innerHTML = '<i class="bi bi-hourglass-split mr-1"></i> Deleting...';
-                _pendingDeleteForm.submit();
-            }
-        }
-
-        // ===== RESUBMIT CONFIRM =====
-        function showConfirmResubmit(form, message) {
-            _pendingResubmitForm = form;
-            document.getElementById('confirmResubmitMessage').textContent = message;
-            const modal = document.getElementById('confirmResubmitModal');
-            const box   = document.getElementById('confirmResubmitBox');
-            modal.classList.remove('hidden');
-            requestAnimationFrame(() => setTimeout(() => {
-                box.classList.remove('scale-95', 'opacity-0');
-                box.classList.add('scale-100', 'opacity-100');
-            }, 20));
-        }
-
-        function closeConfirmResubmit() {
-            const modal = document.getElementById('confirmResubmitModal');
-            const box   = document.getElementById('confirmResubmitBox');
-            box.classList.remove('scale-100', 'opacity-100');
-            box.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => { modal.classList.add('hidden'); _pendingResubmitForm = null; }, 200);
-        }
-
-        function proceedResubmit() {
-            if (_pendingResubmitForm) {
-                const btn = document.getElementById('confirmResubmitBtn');
-                btn.disabled  = true;
-                btn.innerHTML = '<i class="bi bi-hourglass-split mr-1"></i> Submitting...';
-                _pendingResubmitForm.submit();
-            }
-        }
-
-        // Close on backdrop click
-        document.getElementById('confirmDeleteModal').addEventListener('click', function (e) {
-            if (e.target === this) closeConfirmDelete();
-        });
-        document.getElementById('confirmResubmitModal').addEventListener('click', function (e) {
-            if (e.target === this) closeConfirmResubmit();
-        });
-
-        // Close on Escape
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') {
-                closeConfirmDelete();
-                closeConfirmResubmit();
-            }
-        });
-    </script>
+    {{-- Confirm Delete / Confirm Resubmit logic now lives in
+         resources/js/confirm.js, reusing showModal()/hideModal()
+         from modal.js instead of its own separate animation code. --}}
 
     @stack('scripts')
 </body>

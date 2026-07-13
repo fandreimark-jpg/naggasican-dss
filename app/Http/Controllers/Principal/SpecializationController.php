@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Principal;
 use App\Http\Controllers\Controller;
 use App\Models\Specialization;
 use App\Models\Track;
+use App\Helpers\LogActivity;
 use Illuminate\Http\Request;
 
 /**
@@ -38,6 +39,13 @@ class SpecializationController extends Controller
             'name'     => $request->name,
             'code'     => strtoupper($request->code), // auto-uppercase
         ]);
+
+        LogActivity::log(
+            'create_specialization',
+            'Created ' . $request->role . ' specialization: ' . $request->name,
+            'specializations',
+            null
+        );
 
         return redirect()->route('principal.specializations')
             ->with('success', 'Specialization added successfully!');

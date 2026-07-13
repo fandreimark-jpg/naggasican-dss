@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Principal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Track;
+use App\Helpers\LogActivity;
 use Illuminate\Http\Request;
 
 /**
@@ -37,6 +38,13 @@ class TrackController extends Controller
             'name' => $request->name,
             'code' => strtoupper($request->code),
         ]);
+
+         LogActivity::log(
+            'create_track',
+            'Created ' . $request->role . ' tracks: ' . $request->name,
+            'tracks',
+            null
+        );
 
         return redirect()->route('principal.tracks')
             ->with('success', 'Track added successfully!');
@@ -78,7 +86,7 @@ class TrackController extends Controller
         }
 
         $track->delete();
-
+        
         return redirect()->route('principal.tracks')
             ->with('success', 'Track deleted successfully!');
     }

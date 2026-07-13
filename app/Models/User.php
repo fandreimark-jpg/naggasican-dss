@@ -21,6 +21,11 @@ class User extends Authenticatable
     use Notifiable;
 
     // Fields that can be mass-assigned via create() or update()
+    // NOTE: 'role' is intentionally NOT here. It's set explicitly in
+    // UserController instead (see $user->role = ...), so that even if
+    // some future code accidentally mass-assigns from raw request input,
+    // a user could never sneak a 'role' field into their own request
+    // and self-promote to principal.
     protected $fillable = [
         'name',
         'last_name',
@@ -28,7 +33,6 @@ class User extends Authenticatable
         'middle_name',
         'email',
         'password',
-        'role',
     ];
 
     // Fields hidden from JSON output — never expose password

@@ -210,16 +210,8 @@
 
 @push('scripts')
 <script>
-    document.getElementById('userSearch').addEventListener('input', function () {
-        const query = this.value.toLowerCase();
-        const rows = document.querySelectorAll('.user-row');
-        let visibleCount = 0;
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            if (text.includes(query)) { row.style.display = ''; visibleCount++; }
-            else row.style.display = 'none';
-        });
-        document.getElementById('noResults').classList.toggle('hidden', visibleCount > 0);
+    document.addEventListener('DOMContentLoaded', function () {
+        initTableSearch('userSearch', '.user-row', 'noResults');
     });
 </script>
 @endpush

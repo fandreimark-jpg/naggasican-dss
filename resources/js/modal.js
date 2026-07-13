@@ -1,13 +1,8 @@
 // resources/js/modal.js
-// All modal (popup) logic for the whole system.
-//
-// Every modal shares the same 3 helper functions below (show, hide, and
-// "close on outside click") — each modal only keeps the logic that's
-// actually unique to it (like filling in a student's info).
-//
-// showModal()/hideModal() also handle the fade + scale animation, so
-// every modal in the system opens/closes smoothly with no extra work
-// needed per modal — it just needs a child element with class="modal-box".
+
+window.toDateInputValue = function (value) {
+    return value ? value.substring(0, 10) : "";
+};
 
 window.showModal = function (id) {
     const el = document.getElementById(id);
@@ -77,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 student.middle_name ?? "";
             document.getElementById("edit_gender").value = student.gender;
             document.getElementById("edit_birthdate").value =
-                student.birthdate ?? "";
+                window.toDateInputValue(student.birthdate);
             editStudentForm.action = `/adviser/students/${student.id}`;
             window.showModal("editModal");
         };
@@ -178,6 +173,44 @@ document.addEventListener("DOMContentLoaded", function () {
         window.bindModalOverlayClose("userModal");
     }
 
+    // Loads a specialization dropdown for whichever track is picked.
+    // Shared by BOTH the Section modal and the Subject modal — each just
+    // tells it which <select> to fill in and which URL to fetch from,
+    // instead of each page writing its own near-identical copy.
+    window.loadSpecializations = function (trackId, specSelectId, byTrackUrl, selectedSpecId = null) {
+        const specSelect = document.getElementById(specSelectId);
+        specSelect.innerHTML = '<option value="">— Loading... —</option>';
+
+        if (!trackId) {
+            specSelect.innerHTML = '<option value="">— Select Track First —</option>';
+            return;
+        }
+
+        fetch(`${byTrackUrl}/${trackId}`)
+            .then((response) => response.json())
+            .then((data) => {
+                specSelect.innerHTML = '<option value="">— Select Specialization —</option>';
+
+                if (data.length === 0) {
+                    specSelect.innerHTML = '<option value="">— No specializations for this track —</option>';
+                    return;
+                }
+
+                data.forEach((spec) => {
+                    const option = document.createElement("option");
+                    option.value = spec.id;
+                    option.textContent = spec.name;
+                    if (selectedSpecId && spec.id == selectedSpecId) {
+                        option.selected = true;
+                    }
+                    specSelect.appendChild(option);
+                });
+            })
+            .catch(() => {
+                specSelect.innerHTML = '<option value="">— Error loading specializations —</option>';
+            });
+    };
+
     // =============================================
     // PRINCIPAL — SECTION MANAGEMENT MODAL
     // (moved here from the old standalone public/js/principal/sections.js,
@@ -191,44 +224,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const sectionStoreUrl = sectionForm.dataset.storeUrl;
         const specByTrackUrl = sectionForm.dataset.specUrl;
         const adviserSelect = document.getElementById("sectionAdviser");
-
-        // Loads the specialization dropdown for whichever track is picked.
-        // Used by both Add and Edit — attached to window since the
-        // <select onchange="loadSpecializations(this.value)"> in the
-        // blade file calls it directly.
-        window.loadSpecializations = function (trackId, selectedSpecId = null) {
-            const specSelect = document.getElementById("sectionSpec");
-            specSelect.innerHTML = '<option value="">— Loading... —</option>';
-
-            if (!trackId) {
-                specSelect.innerHTML = '<option value="">— Select Track First —</option>';
-                return;
-            }
-
-            fetch(`${specByTrackUrl}/${trackId}`)
-                .then((response) => response.json())
-                .then((data) => {
-                    specSelect.innerHTML = '<option value="">— Select Specialization —</option>';
-
-                    if (data.length === 0) {
-                        specSelect.innerHTML = '<option value="">— No specializations for this track —</option>';
-                        return;
-                    }
-
-                    data.forEach((spec) => {
-                        const option = document.createElement("option");
-                        option.value = spec.id;
-                        option.textContent = spec.name;
-                        if (selectedSpecId && spec.id == selectedSpecId) {
-                            option.selected = true;
-                        }
-                        specSelect.appendChild(option);
-                    });
-                })
-                .catch(() => {
-                    specSelect.innerHTML = '<option value="">— Error loading specializations —</option>';
-                });
-        };
 
         window.openAddSectionModal = function () {
             sectionForm.reset();
@@ -274,7 +269,7 @@ document.addEventListener("DOMContentLoaded", function () {
             adviserSelect.value = section.adviser_id ?? "";
 
             if (section.track_id) {
-                window.loadSpecializations(section.track_id, section.specialization_id);
+                window.loadSpecializations(section.track_id, "sectionSpec", specByTrackUrl, section.specialization_id);
             }
 
             window.showModal("sectionModal");
@@ -308,7 +303,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("ps_first_name").value = student.first_name;
             document.getElementById("ps_middle_name").value = student.middle_name ?? "";
             document.getElementById("ps_gender").value = student.gender;
-            document.getElementById("ps_birthdate").value = student.birthdate ?? "";
+            document.getElementById("ps_birthdate").value = window.toDateInputValue(student.birthdate);
             document.getElementById("ps_section_id").value = student.section_id;
 
             // LRN should not be changed while editing
@@ -329,5 +324,136 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         window.bindModalOverlayClose("principalStudentModal", resetLrnField);
+    }
+
+    // =============================================
+    // PRINCIPAL — TRACK MANAGEMENT MODAL
+    // =============================================
+    const trackForm = document.getElementById("trackForm");
+
+    if (document.getElementById("trackModal") && trackForm) {
+        const trackStoreUrl = trackForm.dataset.storeUrl;
+
+        window.openAddTrackModal = function () {
+            document.getElementById("modalTitle").textContent = "Add Track";
+            document.getElementById("formMethod").value = "POST";
+            trackForm.action = trackStoreUrl;
+            document.getElementById("trackName").value = "";
+            document.getElementById("trackCode").value = "";
+            window.showModal("trackModal");
+        };
+
+        window.openEditTrackModal = function (track) {
+            document.getElementById("modalTitle").textContent = "Edit Track";
+            document.getElementById("formMethod").value = "PUT";
+            trackForm.action = `/principal/tracks/${track.id}`;
+            document.getElementById("trackName").value = track.name;
+            document.getElementById("trackCode").value = track.code;
+            window.showModal("trackModal");
+        };
+
+        window.closeTrackModal = () => window.hideModal("trackModal");
+        window.bindModalOverlayClose("trackModal");
+    }
+
+    // =============================================
+    // PRINCIPAL — SPECIALIZATION MANAGEMENT MODAL
+    // =============================================
+    const specForm = document.getElementById("specForm");
+
+    if (document.getElementById("specModal") && specForm) {
+        const specStoreUrl = specForm.dataset.storeUrl;
+
+        window.openAddSpecModal = function () {
+            document.getElementById("modalTitle").textContent = "Add Specialization";
+            document.getElementById("formMethod").value = "POST";
+            specForm.action = specStoreUrl;
+            document.getElementById("specTrack").value = "";
+            document.getElementById("specName").value = "";
+            document.getElementById("specCode").value = "";
+            window.showModal("specModal");
+        };
+
+        window.openEditSpecModal = function (spec) {
+            document.getElementById("modalTitle").textContent = "Edit Specialization";
+            document.getElementById("formMethod").value = "PUT";
+            specForm.action = `/principal/specializations/${spec.id}`;
+            document.getElementById("specTrack").value = spec.track_id;
+            document.getElementById("specName").value = spec.name;
+            document.getElementById("specCode").value = spec.code;
+            window.showModal("specModal");
+        };
+
+        window.closeSpecModal = () => window.hideModal("specModal");
+        window.bindModalOverlayClose("specModal");
+    }
+
+    // =============================================
+    // PRINCIPAL — SUBJECT MANAGEMENT MODAL
+    // =============================================
+    const subjectForm = document.getElementById("subjectForm");
+
+    if (document.getElementById("subjectModal") && subjectForm) {
+        const subjectStoreUrl = subjectForm.dataset.storeUrl;
+        const subjectSpecByTrackUrl = subjectForm.dataset.specUrl;
+
+        // Shows the track/specialization fields only for elective subjects —
+        // core subjects apply to everyone, so they don't need a track.
+        window.toggleTrackFields = function () {
+            const type = document.getElementById("subjectType").value;
+            const trackFields = document.getElementById("trackFields");
+
+            if (type === "elective") {
+                trackFields.classList.remove("hidden");
+            } else {
+                trackFields.classList.add("hidden");
+                document.getElementById("subjectTrack").value = "";
+                document.getElementById("subjectSpec").innerHTML =
+                    '<option value="">— All specializations in track —</option>';
+            }
+        };
+
+        window.openAddSubjectModal = function () {
+            document.getElementById("modalTitle").textContent = "Add Subject";
+            document.getElementById("formMethod").value = "POST";
+            subjectForm.action = subjectStoreUrl;
+            document.getElementById("subjectName").value = "";
+            document.getElementById("subjectType").value = "";
+            document.getElementById("subjectGrade").value = "";
+            document.getElementById("subjectTrack").value = "";
+            document.getElementById("subjectSpec").innerHTML =
+                '<option value="">— All specializations in track —</option>';
+            document.getElementById("trackFields").classList.add("hidden");
+            window.showModal("subjectModal");
+        };
+
+        window.openEditSubjectModal = function (subject) {
+            document.getElementById("modalTitle").textContent = "Edit Subject";
+            document.getElementById("formMethod").value = "PUT";
+            subjectForm.action = `/principal/subjects/${subject.id}`;
+            document.getElementById("subjectName").value = subject.name;
+            document.getElementById("subjectType").value = subject.type;
+            document.getElementById("subjectGrade").value = subject.grade_level;
+
+            if (subject.type === "elective") {
+                document.getElementById("trackFields").classList.remove("hidden");
+                document.getElementById("subjectTrack").value = subject.track_id ?? "";
+                if (subject.track_id) {
+                    window.loadSpecializations(
+                        subject.track_id,
+                        "subjectSpec",
+                        subjectSpecByTrackUrl,
+                        subject.specialization_id
+                    );
+                }
+            } else {
+                document.getElementById("trackFields").classList.add("hidden");
+            }
+
+            window.showModal("subjectModal");
+        };
+
+        window.closeSubjectModal = () => window.hideModal("subjectModal");
+        window.bindModalOverlayClose("subjectModal");
     }
 });

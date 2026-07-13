@@ -146,5 +146,3 @@
 
     </div>
 </div>
-{{-- Modal open/close and the current-password toggle logic now live in
-     resources/js/modal.js, alongside every other modal in the system. --}}

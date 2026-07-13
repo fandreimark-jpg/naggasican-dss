@@ -11,7 +11,7 @@
             <h2 class="text-sm font-semibold text-gray-800">All Specializations</h2>
             <p class="text-xs text-gray-400">{{ $specializations->count() }} total specializations</p>
         </div>
-        <button type="button" onclick="openAddModal()"
+        <button type="button" onclick="openAddSpecModal()"
             class="bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-800 whitespace-nowrap">
             <i class="bi bi-plus-lg"></i> Add Specialization
         </button>
@@ -38,7 +38,7 @@
                 <td class="px-6 py-3 text-gray-600">{{ $spec->track->name ?? '—' }}</td>
                 <td class="px-6 py-3 text-right space-x-2">
                     <button type="button"
-                        onclick='openEditModal(@json($spec))'
+                        onclick='openEditSpecModal(@json($spec))'
                         class="inline-flex items-center gap-1 text-brand-600 hover:text-brand-800 text-xs font-medium border border-brand-200 rounded px-2 py-1 hover:bg-brand-50">
                         <i class="bi bi-pencil-square"></i> Edit
                     </button>
@@ -68,16 +68,16 @@
 </div>
 
 {{-- MODAL --}}
-<div id="specModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-    <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+<div id="specModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 transition-opacity duration-200 opacity-0">
+    <div class="modal-box bg-white rounded-xl shadow-lg w-full max-w-md p-6 transition-all duration-200 scale-95 opacity-0">
 
         <div class="flex justify-between items-center mb-4">
             <h3 id="modalTitle" class="text-lg font-semibold text-gray-800">Add Specialization</h3>
-            <button type="button" onclick="closeModal()"
+            <button type="button" onclick="closeSpecModal()"
                     class="text-gray-400 hover:text-gray-600">✕</button>
         </div>
 
-        <form id="specForm" method="POST" class="space-y-4">
+        <form id="specForm" method="POST" class="space-y-4" data-store-url="{{ route('principal.specializations.store') }}">
             @csrf
             <input type="hidden" name="_method" id="formMethod" value="POST">
 
@@ -107,7 +107,7 @@
             </div>
 
             <div class="flex justify-end gap-3 pt-2">
-                <button type="button" onclick="closeModal()"
+                <button type="button" onclick="closeSpecModal()"
                         class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
                 <button type="submit"
                         class="bg-brand-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-brand-800">
@@ -117,12 +117,5 @@
         </form>
     </div>
 </div>
-
-@push('scripts')
-<script>
-    const SPEC_STORE_URL = "{{ route('principal.specializations.store') }}";
-</script>
-<script src="{{ asset('js/principal/specializations.js') }}"></script>
-@endpush
 
 @endsection

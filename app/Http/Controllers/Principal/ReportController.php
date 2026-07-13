@@ -13,10 +13,7 @@ use App\Models\Section;
  */
 class ReportController extends Controller
 {
-    /**
-     * Show all sections with their submission status and student grades.
-     * Loads all related data using eager loading to avoid N+1 queries.
-     */
+
     public function index()
     {
         $sections = Section::with([

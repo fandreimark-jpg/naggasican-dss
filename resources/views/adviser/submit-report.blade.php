@@ -26,7 +26,7 @@
         $isSubmitted   = $termInfo['submitted'];
     @endphp
     <div class="bg-white rounded-xl shadow-sm p-5 border-t-4
-        {{ $isSubmitted ? 'border-green-500' : ($isComplete ? 'border-blue-500' : 'border-gray-300') }}">
+        {{ $isSubmitted ? 'border-green-500' : ($isComplete ? 'border-brand-500' : 'border-gray-300') }}">
 
         <div class="flex justify-between items-start mb-3">
             <div>
@@ -58,7 +58,7 @@
                     </p>
                     <div class="flex gap-2">
                         <a href="{{ route('adviser.grades') }}?period={{ $period }}"
-                           class="flex-1 text-center border border-blue-600 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-50">
+                           class="flex-1 text-center border border-brand-600 text-brand-600 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-brand-50">
                             Edit Grades
                         </a>
                         {{-- ✅ FIXED: data-resubmit instead of data-confirm --}}
@@ -85,7 +85,7 @@
                     @csrf
                     <input type="hidden" name="grading_period" value="{{ $period }}">
                     <button type="submit"
-                            class="w-full mt-2 bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
+                            class="w-full mt-2 bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-800">
                         Submit Term {{ $period }} Report
                     </button>
                 </form>

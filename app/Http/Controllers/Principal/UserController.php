@@ -62,15 +62,19 @@ class UserController extends Controller
         // Format: Last Name, First Name
         $fullName = $request->last_name . ', ' . $request->first_name;
 
-        User::create([
+        $user = User::create([
             'name'        => $fullName,
             'last_name'   => $request->last_name,
             'first_name'  => $request->first_name,
             'middle_name' => $request->middle_name,
             'email'       => $email,
             'password'    => Hash::make($request->password), // never store plain text
-            'role'        => $request->role,
         ]);
+
+        // 'role' is set explicitly here rather than inside the create()
+        // array above — see the note on User::$fillable for why.
+        $user->role = $request->role;
+        $user->save();
 
         // Record action in activity logs
         LogActivity::log(
@@ -127,8 +131,12 @@ class UserController extends Controller
             'email'       => $email,
             // Keep existing password if no new password provided
             'password'    => $request->password ? Hash::make($request->password) : $user->password,
-            'role'        => $request->role,
         ]);
+
+        // 'role' is set explicitly here rather than inside the update()
+        // array above — see the note on User::$fillable for why.
+        $user->role = $request->role;
+        $user->save();
 
         return redirect()->route('principal.users')
             ->with('success', 'User updated successfully!');
@@ -156,6 +164,8 @@ class UserController extends Controller
         Grade::where('encoded_by', $user->id)->update(['encoded_by' => null]);
 
         $user->delete();
+
+        
 
         return redirect()->route('principal.users')
             ->with('success', 'User removed successfully!');

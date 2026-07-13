@@ -26,7 +26,7 @@
                     class="border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 w-56">
                 <i class="bi bi-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
             </div>
-            <button type="button" onclick="openAddModal()"
+            <button type="button" onclick="openAddSubjectModal()"
                 class="bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-800 whitespace-nowrap">
                 <i class="bi bi-plus-lg"></i> Add Subject
             </button>
@@ -60,7 +60,7 @@
                 <td class="px-6 py-3 text-gray-600">{{ $subject->specialization->name ?? '—' }}</td>
                 <td class="px-6 py-3 text-right space-x-2">
                     <button type="button"
-                        onclick='openEditModal(@json($subject))'
+                        onclick='openEditSubjectModal(@json($subject))'
                         class="inline-flex items-center gap-1 text-brand-600 hover:text-brand-800 text-xs font-medium border border-brand-200 rounded px-2 py-1 hover:bg-brand-50">
                         <i class="bi bi-pencil-square"></i> Edit
                     </button>
@@ -95,16 +95,18 @@
 </div>
 
 {{-- MODAL --}}
-<div id="subjectModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-    <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
+<div id="subjectModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 transition-opacity duration-200 opacity-0">
+    <div class="modal-box bg-white rounded-xl shadow-lg w-full max-w-lg p-6 transition-all duration-200 scale-95 opacity-0">
 
         <div class="flex justify-between items-center mb-4">
             <h3 id="modalTitle" class="text-lg font-semibold text-gray-800">Add Subject</h3>
-            <button type="button" onclick="closeModal()"
+            <button type="button" onclick="closeSubjectModal()"
                     class="text-gray-400 hover:text-gray-600">✕</button>
         </div>
 
-        <form id="subjectForm" method="POST" class="space-y-4">
+        <form id="subjectForm" method="POST" class="space-y-4"
+              data-store-url="{{ route('principal.subjects.store') }}"
+              data-spec-url="{{ url('principal/specializations-by-track') }}">
             @csrf
             <input type="hidden" name="_method" id="formMethod" value="POST">
 
@@ -140,7 +142,7 @@
                 <div>
                     <label class="block text-sm text-gray-600 mb-1">Track</label>
                     <select name="track_id" id="subjectTrack"
-                            onchange="loadSpecializations(this.value)"
+                            onchange="loadSpecializations(this.value, 'subjectSpec', document.getElementById('subjectForm').dataset.specUrl)"
                             class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                         <option value="">— Select Track —</option>
                         @foreach($tracks as $track)
@@ -161,7 +163,7 @@
             </div>
 
             <div class="flex justify-end gap-3 pt-2">
-                <button type="button" onclick="closeModal()"
+                <button type="button" onclick="closeSubjectModal()"
                         class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
                 <button type="submit"
                         class="bg-brand-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-brand-800">
@@ -171,25 +173,12 @@
         </form>
     </div>
 </div>
+{{-- Modal logic now lives in resources/js/modal.js. --}}
 
 @push('scripts')
 <script>
-    const SUBJECT_STORE_URL   = "{{ route('principal.subjects.store') }}";
-    const SPEC_BY_TRACK_URL   = "{{ url('principal/specializations-by-track') }}";
-    const ALL_SPECIALIZATIONS = @json($specializations);
-</script>
-<script src="{{ asset('js/principal/subjects.js') }}"></script>
-<script>
-    document.getElementById('subjectSearch').addEventListener('input', function () {
-        const query = this.value.toLowerCase();
-        const rows = document.querySelectorAll('.subject-row');
-        let visibleCount = 0;
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            if (text.includes(query)) { row.style.display = ''; visibleCount++; }
-            else row.style.display = 'none';
-        });
-        document.getElementById('noSubjectResults').classList.toggle('hidden', visibleCount > 0);
+    document.addEventListener('DOMContentLoaded', function () {
+        initTableSearch('subjectSearch', '.subject-row', 'noSubjectResults');
     });
 </script>
 @endpush

@@ -7,9 +7,9 @@
 
 {{-- Summary Cards --}}
 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-    <div class="bg-white rounded-lg p-4 shadow-sm border-t-4 border-blue-500">
+    <div class="bg-white rounded-lg p-4 shadow-sm border-t-4 border-brand-500">
         <p class="text-xs text-gray-500">Total Students</p>
-        <p class="text-2xl font-bold text-blue-700 mt-1">{{ $totalStudents }}</p>
+        <p class="text-2xl font-bold text-brand-700 mt-1">{{ $totalStudents }}</p>
     </div>
     <div class="bg-white rounded-lg p-4 shadow-sm border-t-4 border-green-500">
         <p class="text-xs text-gray-500">Low Risk</p>
@@ -186,17 +186,17 @@
                     <p class="text-xs font-semibold text-gray-800">With High Honors</p>
                     <p class="text-xs text-gray-400">Average of 95–97</p>
                 </div>
-                <span class="ml-auto text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">
+                <span class="ml-auto text-xs bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full font-medium">
                     {{ $highHonors->count() }} {{ $highHonors->count() === 1 ? 'student' : 'students' }}
                 </span>
             </div>
             @if($highHonors->count() > 0)
                 <div class="space-y-1">
                     @foreach($highHonors as $student)
-                    <div class="flex justify-between text-xs bg-blue-50 rounded px-3 py-1.5">
+                    <div class="flex justify-between text-xs bg-brand-50 rounded px-3 py-1.5">
                         <span class="font-medium text-gray-800">{{ $student['name'] }}</span>
                         <span class="text-gray-500">{{ $student['section'] }}</span>
-                        <span class="font-semibold text-blue-700">{{ number_format($student['average'], 2) }}</span>
+                        <span class="font-semibold text-brand-700">{{ number_format($student['average'], 2) }}</span>
                     </div>
                     @endforeach
                 </div>

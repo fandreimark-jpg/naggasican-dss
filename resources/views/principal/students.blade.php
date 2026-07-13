@@ -43,6 +43,7 @@
                 <th class="text-left px-6 py-3">Last Name</th>
                 <th class="text-left px-6 py-3">First Name</th>
                 <th class="text-left px-6 py-3">Middle Name</th>
+                <th class="text-left px-6 py-3">Birthdate</th>
                 <th class="text-left px-6 py-3">Gender</th>
                 <th class="text-left px-6 py-3">Section</th>
                 <th class="px-6 py-3 text-right">Actions</th>
@@ -55,6 +56,7 @@
                 <td class="px-6 py-3 font-medium text-gray-800">{{ $student->last_name }}</td>
                 <td class="px-6 py-3 text-gray-800">{{ $student->first_name }}</td>
                 <td class="px-6 py-3 text-gray-500">{{ $student->middle_name ?? '—' }}</td>
+                <td class="px-6 py-3 capitalize text-gray-600">{{ $student->formatted_birthdate }}</td>
                 <td class="px-6 py-3 capitalize text-gray-600">{{ $student->gender }}</td>
                 <td class="px-6 py-3 text-gray-600">
                     {{ $student->section->name ?? '—' }}
@@ -224,16 +226,8 @@
 
 @push('scripts')
 <script>
-    document.getElementById('studentSearch').addEventListener('input', function () {
-        const query = this.value.toLowerCase();
-        const rows = document.querySelectorAll('.student-row');
-        let visibleCount = 0;
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            if (text.includes(query)) { row.style.display = ''; visibleCount++; }
-            else row.style.display = 'none';
-        });
-        document.getElementById('noStudentResults').classList.toggle('hidden', visibleCount > 0);
+    document.addEventListener('DOMContentLoaded', function () {
+        initTableSearch('studentSearch', '.student-row', 'noStudentResults');
     });
 </script>
 @endpush

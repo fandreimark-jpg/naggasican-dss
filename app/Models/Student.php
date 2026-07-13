@@ -23,6 +23,12 @@ class Student extends Model
         'birthdate',
     ];
 
+    // Tells Laravel to treat 'birthdate' as a real date object (Carbon)
+    // instead of a plain string, so ->format() works on it.
+    protected $casts = [
+        'birthdate' => 'date',
+    ];
+
     // =============================================
     // ACCESSORS
     // =============================================
@@ -34,6 +40,16 @@ class Student extends Model
     public function getFullNameAttribute()
     {
         return $this->last_name . ', ' . $this->first_name . ' ' . $this->middle_name;
+    }
+
+    /**
+     * Returns the birthdate as MM/DD/YYYY instead of the raw YYYY-MM-DD
+     * that comes straight from the database.
+     * Accessible as $student->formatted_birthdate
+     */
+    public function getFormattedBirthdateAttribute()
+    {
+        return $this->birthdate ? $this->birthdate->format('m/d/Y') : null;
     }
 
     // =============================================

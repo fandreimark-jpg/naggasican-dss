@@ -137,7 +137,7 @@
             <div>
                 <label class="block text-sm text-gray-600 mb-1">Track</label>
                 <select name="track_id" id="sectionTrack" required
-                        onchange="loadSpecializations(this.value)"
+                        onchange="loadSpecializations(this.value, 'sectionSpec', document.getElementById('sectionForm').dataset.specUrl)"
                         class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                     <option value="">— Select Track —</option>
                     @foreach($tracks as $track)
@@ -186,19 +186,11 @@
         </form>
     </div>
 </div>
-
+@endsection
 @push('scripts')
 <script>
-    document.getElementById('sectionSearch').addEventListener('input', function () {
-        const query = this.value.toLowerCase();
-        const rows = document.querySelectorAll('.section-row');
-        let visibleCount = 0;
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            if (text.includes(query)) { row.style.display = ''; visibleCount++; }
-            else row.style.display = 'none';
-        });
-        document.getElementById('noSectionResults').classList.toggle('hidden', visibleCount > 0);
+    document.addEventListener('DOMContentLoaded', function () {
+        initTableSearch('sectionSearch', '.section-row', 'noSectionResults');
     });
 </script>
 @endpush
