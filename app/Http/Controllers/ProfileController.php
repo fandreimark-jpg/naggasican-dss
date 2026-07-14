@@ -10,12 +10,12 @@ use Illuminate\Validation\Rule;
 /**
  * ProfileController
  * -------------------------------
- * Used by BOTH advisers and principals to update their OWN name,
- * email/username, and password — no need to ask the Principal to
+ * Used by BOTH advisers and admins to update their OWN name,
+ * email/username, and password — no need to ask the Admin to
  * edit it for them.
  *
- * IMPORTANT: Role is NOT editable here. That stays Principal-controlled
- * via /principal/users, so no one can casually change their own account type.
+ * IMPORTANT: Role is NOT editable here. That stays Admin-controlled
+ * via /admin/users, so no one can casually change their own account type.
  *
  * NOTE: There is no dedicated "profile page" anymore — the form
  * lives in a modal (resources/views/profile/_modal.blade.php)

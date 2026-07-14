@@ -11,14 +11,14 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // -------------------------------------------------------
-        // 1. USERS — 1 principal + 2 advisers
+        // 1. USERS — 1 admin + 2 advisers
         // -------------------------------------------------------
         DB::table('users')->insert([
             [
                 'name'       => 'Maria Santos',
-                'email'      => 'principal@naggasican.edu.ph',
+                'email'      => 'admin@naggasican.edu.ph',
                 'password'   => Hash::make('password'),
-                'role'       => 'principal',
+                'role'       => 'admin',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

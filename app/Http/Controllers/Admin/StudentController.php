@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Principal;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Student;
@@ -9,12 +9,12 @@ use App\Helpers\LogActivity;
 use Illuminate\Http\Request;
 
 /**
- * StudentController (Principal)
+ * StudentController (Admin)
  *
- * Principal can view, edit (correct info), and remove student records.
+ * Admin can view, edit (correct info), and remove student records.
  * Adding NEW students is now exclusively an Adviser action
  * (see Adviser\StudentController@store) — matching the paper's design:
- * "advisers encode student data, principal monitors and reviews."
+ * "advisers encode student data, admin monitors and reviews."
  */
 class StudentController extends Controller
 {
@@ -36,7 +36,7 @@ class StudentController extends Controller
             ->orderBy('grade_level')
             ->get();
 
-        return view('principal.students', compact('students', 'sections'));
+        return view('admin.students', compact('students', 'sections'));
     }
 
     /**
@@ -62,7 +62,7 @@ class StudentController extends Controller
             'middle_name', 'gender', 'birthdate', 'section_id'
         ]));
 
-        return redirect()->route('principal.students')
+        return redirect()->route('admin.students')
             ->with('success', 'Student updated successfully!');
     }
 
@@ -82,7 +82,7 @@ class StudentController extends Controller
             $id
         );
 
-        return redirect()->route('principal.students')
+        return redirect()->route('admin.students')
             ->with('success', 'Student removed successfully!');
     }
 }

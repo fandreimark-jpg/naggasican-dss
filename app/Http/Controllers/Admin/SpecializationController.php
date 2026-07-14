@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Principal;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Specialization;
@@ -9,7 +9,7 @@ use App\Helpers\LogActivity;
 use Illuminate\Http\Request;
 
 /**
- * SpecializationController (Principal)
+ * SpecializationController (Admin)
  *
  * Manages SHS specializations under each track.
  * Examples: HUMSS, STEM, ABM under Academic Track.
@@ -22,7 +22,7 @@ class SpecializationController extends Controller
     {
         $specializations = Specialization::with('track')->orderBy('name')->get();
         $tracks          = Track::orderBy('name')->get();
-        return view('principal.specializations', compact('specializations', 'tracks'));
+        return view('admin.specializations', compact('specializations', 'tracks'));
     }
 
     /** Create a new specialization under a track. */
@@ -47,7 +47,7 @@ class SpecializationController extends Controller
             null
         );
 
-        return redirect()->route('principal.specializations')
+        return redirect()->route('admin.specializations')
             ->with('success', 'Specialization added successfully!');
     }
 
@@ -68,7 +68,7 @@ class SpecializationController extends Controller
             'code'     => strtoupper($request->code),
         ]);
 
-        return redirect()->route('principal.specializations')
+        return redirect()->route('admin.specializations')
             ->with('success', 'Specialization updated successfully!');
     }
 
@@ -81,13 +81,13 @@ class SpecializationController extends Controller
         $specialization = Specialization::findOrFail($id);
 
         if ($specialization->sections()->count() > 0) {
-            return redirect()->route('principal.specializations')
+            return redirect()->route('admin.specializations')
                 ->with('error', 'Cannot delete specialization with existing sections.');
         }
 
         $specialization->delete();
 
-        return redirect()->route('principal.specializations')
+        return redirect()->route('admin.specializations')
             ->with('success', 'Specialization deleted successfully!');
     }
 

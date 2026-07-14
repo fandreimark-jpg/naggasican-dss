@@ -32,7 +32,7 @@
             </div>
             {{-- "Add Student" button removed — adding new students is now
                  exclusively done by Advisers on their own Students page.
-                 The Principal can still Edit (correct info) and Delete below. --}}
+                 The Admin can still Edit (correct info) and Delete below. --}}
         </div>
     </div>
 
@@ -71,7 +71,7 @@
                         <i class="bi bi-pencil-square"></i> Edit
                     </button>
                     <form method="POST"
-                          action="{{ route('principal.students.destroy', $student->id) }}"
+                          action="{{ route('admin.students.destroy', $student->id) }}"
                           class="inline"
                           data-confirm="Remove student {{ $student->last_name }}, {{ $student->first_name }}?">
                         @csrf
@@ -126,7 +126,7 @@
 {{-- EDIT STUDENT MODAL
      ("Add" mode was removed — see note above. This modal is now
      only ever opened via openEditStudentModal() in modal.js.) --}}
-<div id="principalStudentModal"
+<div id="adminStudentModal"
      class="{{ $errors->any() ? 'opacity-100' : 'hidden opacity-0' }} fixed inset-0 bg-black/40 flex items-center justify-center z-50 transition-opacity duration-200">
     <div class="modal-box {{ $errors->any() ? 'scale-100 opacity-100' : 'scale-95 opacity-0' }} bg-white rounded-xl shadow-lg w-full max-w-lg p-6 transition-all duration-200">
 
@@ -146,7 +146,7 @@
             </div>
         @endif
 
-        <form id="principalStudentForm" method="POST"
+        <form id="adminStudentForm" method="POST"
               class="space-y-4">
             @csrf
             <input type="hidden" name="_method" id="studentMethod" value="PUT">

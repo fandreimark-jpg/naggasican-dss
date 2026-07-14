@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Principal;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Subject;
@@ -10,7 +10,7 @@ use App\Helpers\LogActivity;
 use Illuminate\Http\Request;
 
 /**
- * SubjectController (Principal)
+ * SubjectController (Admin)
  *
  * Manages SHS subjects — both core and elective.
  * Core subjects apply to all sections of a grade level.
@@ -20,7 +20,7 @@ class SubjectController extends Controller
 {
     /**
      * Show all subjects with optional type filter (core/elective).
-     * URL: /principal/subjects?type=core or ?type=elective
+     * URL: /admin/subjects?type=core or ?type=elective
      */
     public function index()
     {
@@ -34,7 +34,7 @@ class SubjectController extends Controller
         $tracks          = Track::with('specializations')->orderBy('name')->get();
         $specializations = Specialization::with('track')->orderBy('name')->get();
 
-        return view('principal.subjects', compact('subjects', 'tracks', 'specializations'));
+        return view('admin.subjects', compact('subjects', 'tracks', 'specializations'));
     }
 
     /**
@@ -68,7 +68,7 @@ class SubjectController extends Controller
             null
         );
 
-        return redirect()->route('principal.subjects')
+        return redirect()->route('admin.subjects')
             ->with('success', 'Subject added successfully!');
     }
 
@@ -93,7 +93,7 @@ class SubjectController extends Controller
             'specialization_id' => $request->type === 'elective' ? $request->specialization_id : null,
         ]);
 
-        return redirect()->route('principal.subjects')
+        return redirect()->route('admin.subjects')
             ->with('success', 'Subject updated successfully!');
     }
 
@@ -106,13 +106,13 @@ class SubjectController extends Controller
         $subject = Subject::findOrFail($id);
 
         if ($subject->grades()->count() > 0) {
-            return redirect()->route('principal.subjects')
+            return redirect()->route('admin.subjects')
                 ->with('error', 'Cannot delete subject with existing grades.');
         }
 
         $subject->delete();
 
-        return redirect()->route('principal.subjects')
+        return redirect()->route('admin.subjects')
             ->with('success', 'Subject deleted successfully!');
     }
 }

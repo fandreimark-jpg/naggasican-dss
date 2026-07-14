@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
  * StudentController (Adviser)
  *
  * Allows the adviser to view, add, and edit students in their own section.
- * Advisers CANNOT remove students — only the Principal can do that.
+ * Advisers CANNOT remove students — only the Admin can do that.
  * Scoped to the adviser's section for security.
  */
 class StudentController extends Controller
@@ -54,7 +54,7 @@ class StudentController extends Controller
         // Step 2: stop early if this adviser has no section assigned
         if (!$section) {
             return redirect()->route('adviser.students')
-                ->with('error', 'No section assigned to you yet. Contact the principal.');
+                ->with('error', 'No section assigned to you yet. Contact the admin.');
         }
 
         // Step 3: validate all incoming fields before saving anything
@@ -78,7 +78,7 @@ class StudentController extends Controller
             'section_id'  => $section->id, // forced from server — never trust client input for this
         ]);
 
-        // Record this action in the Activity Logs so the Principal can see it.
+        // Record this action in the Activity Logs so the Admin can see it.
         // Without this line, the "add" would happen but stay invisible in the logs.
         LogActivity::log(
             action:      'add_student',
@@ -103,7 +103,7 @@ class StudentController extends Controller
         // would crash here trying to read ->id from null.
         if (!$section) {
             return redirect()->route('adviser.students')
-                ->with('error', 'No section assigned to you yet. Contact the principal.');
+                ->with('error', 'No section assigned to you yet. Contact the admin.');
         }
 
         // Security check — ensure student belongs to adviser's section
@@ -123,7 +123,7 @@ class StudentController extends Controller
             'last_name', 'first_name', 'middle_name', 'gender', 'birthdate'
         ]));
 
-        // Record this action in the Activity Logs so the Principal can see it.
+        // Record this action in the Activity Logs so the Admin can see it.
         LogActivity::log(
             action:      'edit_student',
             description: 'Edited student: ' . $student->last_name . ', ' . $student->first_name,

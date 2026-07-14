@@ -45,9 +45,9 @@
                 <td class="px-6 py-3 text-gray-500">{{ $user->middle_name ?? '—' }}</td>
                 <td class="px-6 py-3 text-gray-500">{{ $user->email }}</td>
                 <td class="px-6 py-3">
-                    @if($user->role === 'principal')
+                    @if($user->role === 'admin')
                         <span class="px-2 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">
-                            <i class="bi bi-shield-lock-fill"></i> Principal
+                            <i class="bi bi-shield-lock-fill"></i> Admin
                         </span>
                     @else
                         <span class="px-2 py-1 rounded-full text-xs font-semibold bg-brand-100 text-brand-700">
@@ -64,7 +64,7 @@
 
                     @if($user->id !== auth()->id())
                     <form method="POST"
-                        action="{{ route('principal.users.destroy', $user->id) }}"
+                        action="{{ route('admin.users.destroy', $user->id) }}"
                         class="inline"
                         data-confirm="Remove user {{ $user->first_name }} {{ $user->last_name }}?">
                         @csrf
@@ -135,7 +135,7 @@
         @endif
 
         <form id="userForm" method="POST"
-              data-store-url="{{ route('principal.users.store') }}"
+              data-store-url="{{ route('admin.users.store') }}"
               class="space-y-4">
             @csrf
             <input type="hidden" name="_method" id="formMethod" value="POST">
@@ -180,7 +180,7 @@
                 <select name="role" id="field_role" required
                         class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                     <option value="adviser">Adviser</option>
-                    <option value="principal">Admin</option>
+                    <option value="admin">Admin</option>
                 </select>
             </div>
 

@@ -2,7 +2,7 @@
 //
 // One generic search box for any table on the site. Every page used to
 // write its own copy of this same "hide rows that don't match" logic
-// (adviser students, sections, principal students, subjects, users) —
+// (adviser students, sections, admin students, subjects, users) —
 // now they all just call initTableSearch() with their own element IDs.
 
 window.initTableSearch = function (searchInputId, rowSelector, noResultsId) {

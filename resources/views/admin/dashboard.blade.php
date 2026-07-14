@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Principal Dashboard')
+@section('title', 'Admin Dashboard')
 @section('subtitle', 'Academic Performance Overview')
 
 @section('content')
@@ -248,5 +248,5 @@
     const TERM_TRENDS       = @json($termTrends);
     const SECTION_RISK_DATA = @json($sectionRiskData);
 </script>
-<script src="{{ asset('js/principal/dashboard.js') }}"></script>
+<script src="{{ asset('js/admin/dashboard.js') }}"></script>
 @endpush

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Principal;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Section;
@@ -11,7 +11,7 @@ use App\Helpers\LogActivity;
 use Illuminate\Http\Request;
 
 /**
- * SectionController (Principal)
+ * SectionController (Admin)
  *
  * Manages class sections — creating, updating, and deleting sections.
  * Each section is assigned to one adviser and belongs to one track/specialization.
@@ -48,7 +48,7 @@ class SectionController extends Controller
         $tracks          = Track::with('specializations')->orderBy('name')->get();
         $specializations = Specialization::with('track')->orderBy('name')->get();
 
-        return view('principal.sections', compact(
+        return view('admin.sections', compact(
             'sections', 'availableAdvisers', 'allAdvisers',
             'tracks', 'specializations'
         ));
@@ -80,7 +80,7 @@ class SectionController extends Controller
 
         LogActivity::log('create_section', 'Created section: ' . $request->name, 'sections', null);
 
-        return redirect()->route('principal.sections')
+        return redirect()->route('admin.sections')
             ->with('success', 'Section created successfully!');
     }
 
@@ -124,7 +124,7 @@ class SectionController extends Controller
             'adviser_id'        => $request->adviser_id ?: null,
         ]);
 
-        return redirect()->route('principal.sections')
+        return redirect()->route('admin.sections')
             ->with('success', 'Section updated successfully!');
     }
 
@@ -138,13 +138,13 @@ class SectionController extends Controller
 
         // Prevent deletion if section has students
         if ($section->students()->count() > 0) {
-            return redirect()->route('principal.sections')
+            return redirect()->route('admin.sections')
                 ->with('error', 'Cannot delete section with existing students.');
         }
 
         $section->delete();
 
-        return redirect()->route('principal.sections')
+        return redirect()->route('admin.sections')
             ->with('success', 'Section deleted successfully!');
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Principal;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -11,27 +11,27 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 /**
- * UserController (Principal)
+ * UserController (Admin)
  *
  * Handles all user account management.
- * Only the Principal can create, update, and delete accounts.
+ * Only the Admin can create, update, and delete accounts.
  * Public registration is disabled — all accounts are created here.
  */
 class UserController extends Controller
 {
     /**
      * Show all user accounts.
-     * Excludes the currently logged-in principal to prevent self-deletion.
+     * Excludes the currently logged-in admin to prevent self-deletion.
      */
     public function index()
     {
         $users = User::where('id', '!=', auth()->id())
             ->with('section')       // eager load section to avoid N+1 queries
-            ->orderBy('role')       // principals first, then advisers
+            ->orderBy('role')       // admins first, then advisers
             ->orderBy('name')       // alphabetical within each role
             ->paginate(10);
 
-        return view('principal.users', compact('users'));
+        return view('admin.users', compact('users'));
     }
 
     /**
@@ -48,7 +48,7 @@ class UserController extends Controller
             'middle_name' => 'nullable|string|max:255',
             'username'    => 'required|string|max:255|alpha_dash',
             'password'    => 'required|string|min:8',
-            'role'        => 'required|in:adviser,principal',
+            'role'        => 'required|in:adviser,admin',
         ]);
 
         // Build email from username
@@ -84,19 +84,8 @@ class UserController extends Controller
             null
         );
 
-        return redirect()->route('principal.users')
+        return redirect()->route('admin.users')
             ->with('success', ucfirst($request->role) . ' account created successfully!');
-    }
-
-    /**
-     * Show edit form for a specific user.
-     * Only adviser accounts are editable via this route.
-     */
-    public function edit($id)
-    {
-        $user     = User::where('id', $id)->firstOrFail();
-        $sections = Section::all();
-        return view('principal.users-edit', compact('user', 'sections'));
     }
 
     /**
@@ -113,7 +102,7 @@ class UserController extends Controller
             'middle_name' => 'nullable|string|max:255',
             'username'    => 'required|string|max:255|alpha_dash',
             'password'    => 'nullable|string|min:8',
-            'role'        => 'required|in:adviser,principal',
+            'role'        => 'required|in:adviser,admin',
         ]);
 
         $email = $request->username . '@naggasican.edu.ph';
@@ -138,7 +127,7 @@ class UserController extends Controller
         $user->role = $request->role;
         $user->save();
 
-        return redirect()->route('principal.users')
+        return redirect()->route('admin.users')
             ->with('success', 'User updated successfully!');
     }
 
@@ -153,7 +142,7 @@ class UserController extends Controller
 
         // Prevent self-deletion
         if ($user->id === auth()->id()) {
-            return redirect()->route('principal.users')
+            return redirect()->route('admin.users')
                 ->with('error', 'You cannot delete your own account.');
         }
 
@@ -167,7 +156,7 @@ class UserController extends Controller
 
         
 
-        return redirect()->route('principal.users')
+        return redirect()->route('admin.users')
             ->with('success', 'User removed successfully!');
     }
 }

@@ -11,8 +11,8 @@ class RegisteredUserController extends Controller
 {
     /**
      * Registration is disabled.
-     * User accounts are created exclusively by the Principal
-     * via User Management (/principal/users).
+     * User accounts are created exclusively by the Admin
+     * via User Management (/admin/users).
      */
     public function create(): View
     {

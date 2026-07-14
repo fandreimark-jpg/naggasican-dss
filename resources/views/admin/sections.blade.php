@@ -61,7 +61,7 @@
                         <i class="bi bi-pencil-square"></i> Edit
                     </button>
                     <form method="POST"
-                          action="{{ route('principal.sections.destroy', $section->id) }}"
+                          action="{{ route('admin.sections.destroy', $section->id) }}"
                           class="inline"
                           data-confirm="Delete section {{ $section->name }}?">
                         @csrf
@@ -111,8 +111,8 @@
         @endif
 
         <form id="sectionForm" method="POST" class="space-y-4"
-              data-store-url="{{ route('principal.sections.store') }}"
-              data-spec-url="{{ url('principal/specializations-by-track') }}">
+              data-store-url="{{ route('admin.sections.store') }}"
+              data-spec-url="{{ url('admin/specializations-by-track') }}">
             @csrf
             <input type="hidden" name="_method" id="sectionMethod" value="POST">
 

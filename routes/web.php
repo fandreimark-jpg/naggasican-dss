@@ -8,22 +8,22 @@ use App\Http\Controllers\Adviser\StudentController as AdviserStudentController;
 use App\Http\Controllers\Adviser\GradeController as AdviserGradeController;
 use App\Http\Controllers\Adviser\ReportController as AdviserReportController;
 
-// Principal controllers
-use App\Http\Controllers\Principal\DashboardController;
-use App\Http\Controllers\Principal\UserController;
-use App\Http\Controllers\Principal\TrackController;
-use App\Http\Controllers\Principal\SpecializationController;
-use App\Http\Controllers\Principal\SubjectController;
-use App\Http\Controllers\Principal\SectionController;
-use App\Http\Controllers\Principal\StudentController;
-use App\Http\Controllers\Principal\ReportController;
-use App\Http\Controllers\Principal\ActivityLogController;
+// Admin controllers
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\TrackController;
+use App\Http\Controllers\Admin\SpecializationController;
+use App\Http\Controllers\Admin\SubjectController;
+use App\Http\Controllers\Admin\SectionController;
+use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\ActivityLogController;
 
 // Root redirect
 Route::get('/', function () {
     if (auth()->check()) {
-        if (auth()->user()->role === 'principal') {
-            return redirect()->route('principal.dashboard');
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
         }
         return redirect()->route('adviser.dashboard');
     }
@@ -31,19 +31,19 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    if (auth()->user()->role === 'principal') {
-        return redirect()->route('principal.dashboard');
+    if (auth()->user()->role === 'admin') {
+        return redirect()->route('admin.dashboard');
     }
     return redirect()->route('adviser.dashboard');
 })->middleware('auth')->name('dashboard');
 
 // =============================================
-// PROFILE (self-service — any logged-in user, adviser or principal)
+// PROFILE (self-service — any logged-in user, adviser or admin)
 // -----------------------------------------------
 // This is where the request goes when "Save Changes" or "Update Password"
 // is clicked in the My Profile modal (included on every page — see
 // resources/views/profile/_modal.blade.php). Open to BOTH advisers and
-// principals (only 'auth' middleware — no role check needed), because
+// admins (only 'auth' middleware — no role check needed), because
 // each user can only ever edit THEIR OWN account. That check happens
 // inside the Controller itself, using auth()->id() to know who is logged in.
 // =============================================
@@ -72,11 +72,11 @@ Route::middleware(['auth', 'role:adviser'])
     });
 
 // =============================================
-// PRINCIPAL ROUTES
+// ADMIN ROUTES
 // =============================================
-Route::middleware(['auth', 'role:principal'])
-    ->prefix('principal')
-    ->name('principal.')
+Route::middleware(['auth', 'role:admin'])
+    ->prefix('admin')
+    ->name('admin.')
     ->group(function () {
 
         // Dashboard
@@ -85,7 +85,6 @@ Route::middleware(['auth', 'role:principal'])
         // User Management
         Route::get('/users',            [UserController::class, 'index'])->name('users');
         Route::post('/users',           [UserController::class, 'store'])->name('users.store');
-        Route::get('/users/{id}/edit',  [UserController::class, 'edit'])->name('users.edit');
         Route::put('/users/{id}',       [UserController::class, 'update'])->name('users.update');
         Route::delete('/users/{id}',    [UserController::class, 'destroy'])->name('users.destroy');
 
@@ -119,7 +118,7 @@ Route::middleware(['auth', 'role:principal'])
         // Students Management
         // NOTE: no POST /students (add) route here anymore — adding students
         // is now exclusively an Adviser action (see adviser.students.store above),
-        // matching the paper's design: "advisers encode, principal monitors."
+        // matching the paper's design: "advisers encode, admin monitors."
         Route::get('/students',         [StudentController::class, 'index'])->name('students');
         Route::put('/students/{id}',    [StudentController::class, 'update'])->name('students.update');
         Route::delete('/students/{id}', [StudentController::class, 'destroy'])->name('students.destroy');

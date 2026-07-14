@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
  * before allowing access to a route.
  *
  * Usage in routes:
- * Route::middleware(['auth', 'role:principal'])->group(...)
+ * Route::middleware(['auth', 'role:admin'])->group(...)
  * Route::middleware(['auth', 'role:adviser'])->group(...)
  */
 class RoleMiddleware

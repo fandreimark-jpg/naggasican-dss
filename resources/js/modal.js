@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // =============================================
-    // PROFILE MODAL (used on every page, adviser or principal)
+    // PROFILE MODAL (used on every page, adviser or admin)
     // =============================================
     if (document.getElementById("profileModal")) {
         window.openProfileModal = () => window.showModal("profileModal");
@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // =============================================
-    // PRINCIPAL — USER MANAGEMENT MODAL
+    // ADMIN — USER MANAGEMENT MODAL
     // =============================================
     const userForm = document.getElementById("userForm");
     const userTitle = document.getElementById("modalTitle");
@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
             userForm.reset();
             userTitle.textContent = "Edit User";
             userSubmit.textContent = "Update User";
-            userForm.action = `/principal/users/${user.id}`;
+            userForm.action = `/admin/users/${user.id}`;
             userMethod.value = "PUT";
 
             document.getElementById("field_last_name").value = user.last_name ?? "";
@@ -212,8 +212,8 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     // =============================================
-    // PRINCIPAL — SECTION MANAGEMENT MODAL
-    // (moved here from the old standalone public/js/principal/sections.js,
+    // ADMIN — SECTION MANAGEMENT MODAL
+    // (moved here from the old standalone public/js/admin/sections.js,
     // which duplicated this same logic in a separate, non-bundled file)
     // =============================================
     const sectionForm = document.getElementById("sectionForm");
@@ -250,7 +250,7 @@ document.addEventListener("DOMContentLoaded", function () {
             sectionForm.reset();
             sectionTitle.textContent = "Edit Section";
             sectionMethod.value = "PUT";
-            sectionForm.action = `/principal/sections/${section.id}`;
+            sectionForm.action = `/admin/sections/${section.id}`;
 
             document.getElementById("sectionName").value = section.name;
             document.getElementById("sectionGrade").value = section.grade_level;
@@ -280,22 +280,22 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // =============================================
-    // PRINCIPAL — STUDENT MANAGEMENT MODAL
+    // ADMIN — STUDENT MANAGEMENT MODAL
     // (Edit-only — adding new students moved to the Adviser side)
     // =============================================
-    const principalStudentForm = document.getElementById("principalStudentForm");
+    const adminStudentForm = document.getElementById("adminStudentForm");
     const studentModalTitle = document.getElementById("studentModalTitle");
     const studentMethod = document.getElementById("studentMethod");
     const studentSubmitBtn = document.getElementById("studentSubmitBtn");
 
-    if (document.getElementById("principalStudentModal") && principalStudentForm) {
+    if (document.getElementById("adminStudentModal") && adminStudentForm) {
         const lrnField = () => document.getElementById("ps_lrn");
 
         window.openEditStudentModal = function (student) {
-            principalStudentForm.reset();
+            adminStudentForm.reset();
             studentModalTitle.textContent = "Edit Student";
             studentSubmitBtn.textContent = "Update Student";
-            principalStudentForm.action = `/principal/students/${student.id}`;
+            adminStudentForm.action = `/admin/students/${student.id}`;
             studentMethod.value = "PUT";
 
             document.getElementById("ps_lrn").value = student.lrn;
@@ -310,7 +310,7 @@ document.addEventListener("DOMContentLoaded", function () {
             lrnField().readOnly = true;
             lrnField().classList.add("bg-gray-50", "text-gray-400");
 
-            window.showModal("principalStudentModal");
+            window.showModal("adminStudentModal");
         };
 
         const resetLrnField = function () {
@@ -320,14 +320,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         window.closeStudentModal = function () {
             resetLrnField();
-            window.hideModal("principalStudentModal");
+            window.hideModal("adminStudentModal");
         };
 
-        window.bindModalOverlayClose("principalStudentModal", resetLrnField);
+        window.bindModalOverlayClose("adminStudentModal", resetLrnField);
     }
 
     // =============================================
-    // PRINCIPAL — TRACK MANAGEMENT MODAL
+    // ADMIN — TRACK MANAGEMENT MODAL
     // =============================================
     const trackForm = document.getElementById("trackForm");
 
@@ -346,7 +346,7 @@ document.addEventListener("DOMContentLoaded", function () {
         window.openEditTrackModal = function (track) {
             document.getElementById("modalTitle").textContent = "Edit Track";
             document.getElementById("formMethod").value = "PUT";
-            trackForm.action = `/principal/tracks/${track.id}`;
+            trackForm.action = `/admin/tracks/${track.id}`;
             document.getElementById("trackName").value = track.name;
             document.getElementById("trackCode").value = track.code;
             window.showModal("trackModal");
@@ -357,7 +357,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // =============================================
-    // PRINCIPAL — SPECIALIZATION MANAGEMENT MODAL
+    // ADMIN — SPECIALIZATION MANAGEMENT MODAL
     // =============================================
     const specForm = document.getElementById("specForm");
 
@@ -377,7 +377,7 @@ document.addEventListener("DOMContentLoaded", function () {
         window.openEditSpecModal = function (spec) {
             document.getElementById("modalTitle").textContent = "Edit Specialization";
             document.getElementById("formMethod").value = "PUT";
-            specForm.action = `/principal/specializations/${spec.id}`;
+            specForm.action = `/admin/specializations/${spec.id}`;
             document.getElementById("specTrack").value = spec.track_id;
             document.getElementById("specName").value = spec.name;
             document.getElementById("specCode").value = spec.code;
@@ -389,7 +389,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // =============================================
-    // PRINCIPAL — SUBJECT MANAGEMENT MODAL
+    // ADMIN — SUBJECT MANAGEMENT MODAL
     // =============================================
     const subjectForm = document.getElementById("subjectForm");
 
@@ -430,7 +430,7 @@ document.addEventListener("DOMContentLoaded", function () {
         window.openEditSubjectModal = function (subject) {
             document.getElementById("modalTitle").textContent = "Edit Subject";
             document.getElementById("formMethod").value = "PUT";
-            subjectForm.action = `/principal/subjects/${subject.id}`;
+            subjectForm.action = `/admin/subjects/${subject.id}`;
             document.getElementById("subjectName").value = subject.name;
             document.getElementById("subjectType").value = subject.type;
             document.getElementById("subjectGrade").value = subject.grade_level;

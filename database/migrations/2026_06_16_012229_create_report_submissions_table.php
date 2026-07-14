@@ -21,7 +21,7 @@ return new class extends Migration
                   ->default('pending');
             $table->string('school_year');
             $table->timestamp('submitted_at')->nullable();   // exact time ng submission
-            $table->timestamp('approved_at')->nullable();    // exact time ng approval ng principal
+            $table->timestamp('approved_at')->nullable();    // exact time ng approval ng admin
             $table->timestamps();
 
             // Isang submission lang per section per grading period per school year

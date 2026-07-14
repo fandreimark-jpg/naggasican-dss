@@ -17,41 +17,41 @@
             </div>
 
             <nav class="flex-1 p-4 space-y-1">
-                @if(auth()->user()->role === 'principal')
-                    <a href="{{ route('principal.dashboard') }}"
-                    class="flex items-center gap-3 px-4 py-2 rounded-lg border-l-4 hover:bg-brand-700 {{ request()->routeIs('principal.dashboard') ? 'bg-brand-700 border-gold-500' : 'border-transparent' }}">
+                @if(auth()->user()->role === 'admin')
+                    <a href="{{ route('admin.dashboard') }}"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg border-l-4 hover:bg-brand-700 {{ request()->routeIs('admin.dashboard') ? 'bg-brand-700 border-gold-500' : 'border-transparent' }}">
                         <i class="bi bi-speedometer2"></i> Dashboard
                     </a>
-                    <a href="{{ route('principal.users') }}"
-                    class="flex items-center gap-3 px-4 py-2 rounded-lg border-l-4 hover:bg-brand-700 {{ request()->routeIs('principal.users*') ? 'bg-brand-700 border-gold-500' : 'border-transparent' }}">
+                    <a href="{{ route('admin.users') }}"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg border-l-4 hover:bg-brand-700 {{ request()->routeIs('admin.users*') ? 'bg-brand-700 border-gold-500' : 'border-transparent' }}">
                         <i class="bi bi-people"></i> Users
                     </a>
-                    <a href="{{ route('principal.tracks') }}"
-                    class="flex items-center gap-3 px-4 py-2 rounded-lg border-l-4 hover:bg-brand-700 {{ request()->routeIs('principal.tracks*') ? 'bg-brand-700 border-gold-500' : 'border-transparent' }}">
+                    <a href="{{ route('admin.tracks') }}"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg border-l-4 hover:bg-brand-700 {{ request()->routeIs('admin.tracks*') ? 'bg-brand-700 border-gold-500' : 'border-transparent' }}">
                         <i class="bi bi-diagram-3"></i> Tracks
                     </a>
-                    <a href="{{ route('principal.specializations') }}"
-                    class="flex items-center gap-3 px-4 py-2 rounded-lg border-l-4 hover:bg-brand-700 {{ request()->routeIs('principal.specializations*') ? 'bg-brand-700 border-gold-500' : 'border-transparent' }}">
+                    <a href="{{ route('admin.specializations') }}"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg border-l-4 hover:bg-brand-700 {{ request()->routeIs('admin.specializations*') ? 'bg-brand-700 border-gold-500' : 'border-transparent' }}">
                         <i class="bi bi-collection"></i> Specializations
                     </a>
-                    <a href="{{ route('principal.subjects') }}"
-                    class="flex items-center gap-3 px-4 py-2 rounded-lg border-l-4 hover:bg-brand-700 {{ request()->routeIs('principal.subjects*') ? 'bg-brand-700 border-gold-500' : 'border-transparent' }}">
+                    <a href="{{ route('admin.subjects') }}"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg border-l-4 hover:bg-brand-700 {{ request()->routeIs('admin.subjects*') ? 'bg-brand-700 border-gold-500' : 'border-transparent' }}">
                         <i class="bi bi-book"></i> Subjects
                     </a>
-                    <a href="{{ route('principal.sections') }}"
-                    class="flex items-center gap-3 px-4 py-2 rounded-lg border-l-4 hover:bg-brand-700 {{ request()->routeIs('principal.sections*') ? 'bg-brand-700 border-gold-500' : 'border-transparent' }}">
+                    <a href="{{ route('admin.sections') }}"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg border-l-4 hover:bg-brand-700 {{ request()->routeIs('admin.sections*') ? 'bg-brand-700 border-gold-500' : 'border-transparent' }}">
                         <i class="bi bi-grid"></i> Sections
                     </a>
-                    <a href="{{ route('principal.students') }}"
-                    class="flex items-center gap-3 px-4 py-2 rounded-lg border-l-4 hover:bg-brand-700 {{ request()->routeIs('principal.students*') ? 'bg-brand-700 border-gold-500' : 'border-transparent' }}">
+                    <a href="{{ route('admin.students') }}"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg border-l-4 hover:bg-brand-700 {{ request()->routeIs('admin.students*') ? 'bg-brand-700 border-gold-500' : 'border-transparent' }}">
                         <i class="bi bi-mortarboard"></i> Students
                     </a>
-                    <a href="{{ route('principal.reports') }}"
-                    class="flex items-center gap-3 px-4 py-2 rounded-lg border-l-4 hover:bg-brand-700 {{ request()->routeIs('principal.reports*') ? 'bg-brand-700 border-gold-500' : 'border-transparent' }}">
+                    <a href="{{ route('admin.reports') }}"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg border-l-4 hover:bg-brand-700 {{ request()->routeIs('admin.reports*') ? 'bg-brand-700 border-gold-500' : 'border-transparent' }}">
                         <i class="bi bi-file-earmark-text"></i> Reports
                     </a>
-                    <a href="{{ route('principal.activity.logs') }}"
-                    class="flex items-center gap-3 px-4 py-2 rounded-lg border-l-4 hover:bg-brand-700 {{ request()->routeIs('principal.activity*') ? 'bg-brand-700 border-gold-500' : 'border-transparent' }}">
+                    <a href="{{ route('admin.activity.logs') }}"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg border-l-4 hover:bg-brand-700 {{ request()->routeIs('admin.activity*') ? 'bg-brand-700 border-gold-500' : 'border-transparent' }}">
                         <i class="bi bi-clock-history"></i> Activity Logs
                     </a>
                 @else
@@ -78,7 +78,7 @@
                 {{-- Icon button next to the user's name — opens the Profile
                      modal (defined in resources/views/profile/_modal.blade.php)
                      instead of navigating to a separate page. Visible to BOTH
-                     advisers and principals; each only ever edits their own account. --}}
+                     advisers and admins; each only ever edits their own account. --}}
                 <div class="flex items-center gap-2">
                     <button type="button" onclick="openProfileModal()"
                             title="My Profile"

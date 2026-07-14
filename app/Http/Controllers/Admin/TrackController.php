@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Principal;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Track;
@@ -8,7 +8,7 @@ use App\Helpers\LogActivity;
 use Illuminate\Http\Request;
 
 /**
- * TrackController (Principal)
+ * TrackController (Admin)
  *
  * Manages SHS tracks — Academic Track and Technical-Professional Track.
  * Tracks are the top-level category for sections and specializations.
@@ -19,7 +19,7 @@ class TrackController extends Controller
     public function index()
     {
         $tracks = Track::with('specializations')->orderBy('name')->get();
-        return view('principal.tracks', compact('tracks'));
+        return view('admin.tracks', compact('tracks'));
     }
 
     /**
@@ -46,7 +46,7 @@ class TrackController extends Controller
             null
         );
 
-        return redirect()->route('principal.tracks')
+        return redirect()->route('admin.tracks')
             ->with('success', 'Track added successfully!');
     }
 
@@ -68,7 +68,7 @@ class TrackController extends Controller
             'code' => strtoupper($request->code),
         ]);
 
-        return redirect()->route('principal.tracks')
+        return redirect()->route('admin.tracks')
             ->with('success', 'Track updated successfully!');
     }
 
@@ -81,13 +81,13 @@ class TrackController extends Controller
         $track = Track::findOrFail($id);
 
         if ($track->sections()->count() > 0) {
-            return redirect()->route('principal.tracks')
+            return redirect()->route('admin.tracks')
                 ->with('error', 'Cannot delete track with existing sections.');
         }
 
         $track->delete();
         
-        return redirect()->route('principal.tracks')
+        return redirect()->route('admin.tracks')
             ->with('success', 'Track deleted successfully!');
     }
 }

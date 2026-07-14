@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Principal;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 
 /**
- * ActivityLogController (Principal)
+ * ActivityLogController (Admin)
  *
  * Shows the system activity log — a complete audit trail
  * of all actions performed by users in the system.
@@ -25,6 +25,6 @@ class ActivityLogController extends Controller
             ->orderBy('created_at', 'desc')     // most recent first
             ->paginate(20);
 
-        return view('principal.activity-logs', compact('logs'));
+        return view('admin.activity-logs', compact('logs'));
     }
 }

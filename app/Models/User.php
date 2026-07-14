@@ -10,10 +10,10 @@ use Illuminate\Notifications\Notifiable;
 /**
  * User Model
  *
- * Represents a system user — either a Principal or Adviser.
- * Roles: 'principal' or 'adviser'
+ * Represents a system user — either an Admin or Adviser.
+ * Roles: 'admin' or 'adviser'
  *
- * Principal → can manage all data, view dashboard and reports
+ * Admin → can manage all data, view dashboard and reports
  * Adviser   → can encode grades and submit reports for their section
  */
 class User extends Authenticatable
@@ -25,7 +25,7 @@ class User extends Authenticatable
     // UserController instead (see $user->role = ...), so that even if
     // some future code accidentally mass-assigns from raw request input,
     // a user could never sneak a 'role' field into their own request
-    // and self-promote to principal.
+    // and self-promote to admin.
     protected $fillable = [
         'name',
         'last_name',
@@ -64,10 +64,10 @@ class User extends Authenticatable
         return $this->role === 'adviser';
     }
 
-    /** Returns true if user is a principal */
-    public function isPrincipal(): bool
+    /** Returns true if user is an admin */
+    public function isAdmin(): bool
     {
-        return $this->role === 'principal';
+        return $this->role === 'admin';
     }
 
     // =============================================

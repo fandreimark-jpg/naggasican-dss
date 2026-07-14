@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Principal;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Student;
@@ -10,9 +10,9 @@ use App\Models\RiskResult;
 use App\Models\User;
 
 /**
- * DashboardController (Principal)
+ * DashboardController (Admin)
  *
- * Handles the Principal Dashboard — the main Decision Support System interface.
+ * Handles the Admin Dashboard — the main Decision Support System interface.
  * Shows risk distribution, performance trends, at-risk students,
  * academic honors, and intervention recommendations.
  */
@@ -120,7 +120,7 @@ class DashboardController extends Controller
         $highHonors    = $allStudentsWithRisk->filter(fn($s) => $s['average'] >= 95 && $s['average'] < 98)->values();
         $withHonors    = $allStudentsWithRisk->filter(fn($s) => $s['average'] >= 90 && $s['average'] < 95)->values();
 
-        return view('principal.dashboard', compact(
+        return view('admin.dashboard', compact(
             'totalStudents', 'totalSections', 'totalAdvisers',
             'lowRisk', 'moderateRisk', 'highRisk',
             'sections', 'termTrends', 'atRiskStudents', 'sectionRiskData',

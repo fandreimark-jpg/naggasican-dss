@@ -13,11 +13,11 @@
         </div>
         <div class="flex items-center gap-3 flex-wrap">
             <div class="flex gap-2">
-                <a href="{{ route('principal.subjects') }}"
+                <a href="{{ route('admin.subjects') }}"
                    class="text-xs px-3 py-1.5 rounded-full {{ !request('type') ? 'bg-brand-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">All</a>
-                <a href="{{ route('principal.subjects', ['type' => 'core']) }}"
+                <a href="{{ route('admin.subjects', ['type' => 'core']) }}"
                    class="text-xs px-3 py-1.5 rounded-full {{ request('type') === 'core' ? 'bg-brand-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">Core</a>
-                <a href="{{ route('principal.subjects', ['type' => 'elective']) }}"
+                <a href="{{ route('admin.subjects', ['type' => 'elective']) }}"
                    class="text-xs px-3 py-1.5 rounded-full {{ request('type') === 'elective' ? 'bg-brand-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">Elective</a>
             </div>
             <div class="relative">
@@ -65,7 +65,7 @@
                         <i class="bi bi-pencil-square"></i> Edit
                     </button>
                     <form method="POST"
-                          action="{{ route('principal.subjects.destroy', $subject->id) }}"
+                          action="{{ route('admin.subjects.destroy', $subject->id) }}"
                           class="inline"
                           data-confirm="Delete subject {{ $subject->name }}?">
                         @csrf
@@ -105,8 +105,8 @@
         </div>
 
         <form id="subjectForm" method="POST" class="space-y-4"
-              data-store-url="{{ route('principal.subjects.store') }}"
-              data-spec-url="{{ url('principal/specializations-by-track') }}">
+              data-store-url="{{ route('admin.subjects.store') }}"
+              data-spec-url="{{ url('admin/specializations-by-track') }}">
             @csrf
             <input type="hidden" name="_method" id="formMethod" value="POST">
 

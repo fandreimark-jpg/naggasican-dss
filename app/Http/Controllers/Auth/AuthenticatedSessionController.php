@@ -35,7 +35,7 @@ class AuthenticatedSessionController extends Controller
 
         $user = auth()->user();
 
-        // Log login action for ALL users — principal and adviser
+        // Log login action for ALL users — admin and adviser
         LogActivity::log(
             action:      'login',
             description: $user->name . ' logged in',
@@ -44,8 +44,8 @@ class AuthenticatedSessionController extends Controller
         );
 
         // Redirect to correct dashboard based on role
-        if ($user->isPrincipal()) {
-            return redirect()->route('principal.dashboard');
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.dashboard');
         }
 
         return redirect()->route('adviser.dashboard');

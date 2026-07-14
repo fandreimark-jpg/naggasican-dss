@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Principal;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Section;
 
 /**
- * ReportController (Principal)
+ * ReportController (Admin)
  *
  * Shows the reports page — grade overview and risk levels per section.
- * The principal can see all submitted reports from all advisers.
+ * The admin can see all submitted reports from all advisers.
  */
 class ReportController extends Controller
 {
@@ -27,6 +27,6 @@ class ReportController extends Controller
         ->orderBy('grade_level')
         ->get();
 
-        return view('principal.reports', compact('sections'));
+        return view('admin.reports', compact('sections'));
     }
 }

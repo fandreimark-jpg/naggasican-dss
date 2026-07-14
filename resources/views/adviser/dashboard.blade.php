@@ -12,7 +12,7 @@
 @if(!$section)
     <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
         <p class="text-yellow-700 font-medium">No section assigned yet.</p>
-        <p class="text-yellow-600 text-sm mt-1">Please contact the principal to assign you a section.</p>
+        <p class="text-yellow-600 text-sm mt-1">Please contact the admin to assign you a section.</p>
     </div>
 @else
 
