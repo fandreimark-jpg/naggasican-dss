@@ -166,7 +166,7 @@
                 <select name="adviser_id" id="sectionAdviser"
                         class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
                     <option value="">— No Adviser —</option>
-                    @foreach($availableAdvisers as $adviser)
+                    @foreach($allAdvisers as $adviser)
                         <option value="{{ $adviser->id }}"
                             data-section-id="{{ $adviser->section->id ?? '' }}">
                             {{ $adviser->last_name }}, {{ $adviser->first_name }}

@@ -28,20 +28,13 @@ class SectionController extends Controller
             ->orderBy('grade_level')
             ->get();
 
-        // Get IDs of advisers already assigned to a section
-        $assignedAdviserIds = Section::whereNotNull('adviser_id')
-            ->pluck('adviser_id')
-            ->toArray();
-
-        // Only show unassigned advisers in the Add dropdown
-        // Prevents assigning one adviser to multiple sections
-        $availableAdvisers = User::where('role', 'adviser')
-            ->whereNotIn('id', $assignedAdviserIds)
-            ->orderBy('last_name')
-            ->get();
-
-        // All advisers shown in Edit dropdown (including currently assigned)
+        // All advisers, each tagged (via ->section) with whichever section
+        // they're currently assigned to, if any. The single "Assign Adviser"
+        // dropdown (shared by both Add and Edit) uses this full list —
+        // JavaScript then filters which options are visible depending on
+        // whether we're adding a new section or editing an existing one.
         $allAdvisers = User::where('role', 'adviser')
+            ->with('section')
             ->orderBy('last_name')
             ->get();
 
@@ -49,7 +42,7 @@ class SectionController extends Controller
         $specializations = Specialization::with('track')->orderBy('name')->get();
 
         return view('admin.sections', compact(
-            'sections', 'availableAdvisers', 'allAdvisers',
+            'sections', 'allAdvisers',
             'tracks', 'specializations'
         ));
     }

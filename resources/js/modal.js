@@ -257,8 +257,14 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("sectionTrack").value = section.track_id ?? "";
             document.getElementById("sectionSchoolYear").value = section.school_year;
 
-            // Show every adviser EXCEPT those already on a different section —
-            // the adviser currently on THIS section should still be visible.
+            // Show every adviser EXCEPT those already on a DIFFERENT section —
+            // the adviser currently on THIS section stays visible and selected.
+            // (Earlier we removed this filtering entirely, thinking the hide
+            // logic itself was the bug — but the real bug was one level up:
+            // the dropdown's options came from $availableAdvisers, which
+            // excluded the current section's own adviser from the list
+            // completely. Now that the blade loops over $allAdvisers instead,
+            // the option genuinely exists, so this filtering is safe again.)
             Array.from(adviserSelect.options).forEach((option) => {
                 const belongsToAnotherSection =
                     option.value !== "" &&
