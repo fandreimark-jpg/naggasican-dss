@@ -9,11 +9,31 @@
 </head>
 <body class="bg-gray-100 font-sans">
 
+    {{-- Hamburger button — mobile only (hidden on desktop via md:hidden).
+         Fixed at top-left so it's always reachable even while scrolling. --}}
+    <button type="button" onclick="toggleSidebar()"
+            class="md:hidden fixed top-4 left-4 z-50 bg-brand-900 text-white p-2.5 rounded-lg shadow-lg">
+        <i class="bi bi-list text-xl"></i>
+    </button>
+
+    {{-- Dark overlay behind the sidebar on mobile — tapping it closes
+         the menu, same pattern as clicking outside any other modal. --}}
+    <div id="sidebarOverlay" onclick="closeSidebar()"
+         class="hidden md:hidden fixed inset-0 bg-black/50 z-30"></div>
+
     <div class="flex min-h-screen">
-        <aside class="w-64 bg-brand-900 text-white flex flex-col">
-            <div class="p-6 border-b border-brand-700">
-                <h1 class="text-lg font-bold leading-tight">Naggasican NHS</h1>
-                <p class="text-xs text-brand-300 mt-1">Decision Support System</p>
+        <aside id="sidebar"
+               class="w-64 bg-brand-900 text-white flex flex-col fixed md:static inset-y-0 left-0 z-40 -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out">
+            <div class="p-6 border-b border-brand-700 flex items-start justify-between">
+                <div>
+                    <h1 class="text-lg font-bold leading-tight">Naggasican NHS</h1>
+                    <p class="text-xs text-brand-300 mt-1">Decision Support System</p>
+                </div>
+                {{-- Close button — mobile only, lets users dismiss the
+                     drawer without hunting for the overlay or hamburger. --}}
+                <button type="button" onclick="closeSidebar()" class="md:hidden text-brand-300 hover:text-white">
+                    <i class="bi bi-x-lg text-lg"></i>
+                </button>
             </div>
 
             <nav class="flex-1 p-4 space-y-1">

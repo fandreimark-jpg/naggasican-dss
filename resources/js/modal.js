@@ -4,6 +4,29 @@ window.toDateInputValue = function (value) {
     return value ? value.substring(0, 10) : "";
 };
 
+// Mobile sidebar (hamburger menu) — shows/hides the navigation drawer
+// on small screens. On desktop the sidebar is always visible via the
+// md:translate-x-0 class in the blade file, so these functions only
+// ever matter below the md breakpoint.
+window.toggleSidebar = function () {
+    const sidebar = document.getElementById("sidebar");
+    if (!sidebar) return;
+    const isOpen = !sidebar.classList.contains("-translate-x-full");
+    if (isOpen) {
+        window.closeSidebar();
+    } else {
+        sidebar.classList.remove("-translate-x-full");
+        document.getElementById("sidebarOverlay")?.classList.remove("hidden");
+    }
+};
+
+window.closeSidebar = function () {
+    const sidebar = document.getElementById("sidebar");
+    if (!sidebar) return;
+    sidebar.classList.add("-translate-x-full");
+    document.getElementById("sidebarOverlay")?.classList.add("hidden");
+};
+
 window.showModal = function (id) {
     const el = document.getElementById(id);
     if (!el) return;
